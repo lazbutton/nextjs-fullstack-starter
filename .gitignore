@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# markdown files (generated, except README.md and PROJECT_PREFERENCES.md)
+*.md
+!/README.md
+!**/README.md
+!/PROJECT_PREFERENCES.md
