@@ -11,11 +11,12 @@ export function isEmailVerificationEnabled(): boolean {
   const envValue = process.env.ENABLE_EMAIL_VERIFICATION
   
   // Default to true if not set (secure by default)
-  if (envValue === undefined) {
+  if (!envValue) {
     return true
   }
   
   // Support various truthy values
-  return envValue.toLowerCase() === 'true' || envValue === '1'
+  const normalizedValue = envValue.toLowerCase().trim()
+  return normalizedValue === 'true' || normalizedValue === '1'
 }
 
