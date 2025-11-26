@@ -1,28 +1,37 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
+import { useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { locales, type Locale } from '@/i18n/config'
-import { getLocalizedPathname } from '@/lib/i18n'
+import { changeLocale } from '@/app/actions/locale'
 
-export function LocaleSwitcher() {
+export function LocaleSwitcher({ currentLocale }: { currentLocale: Locale }) {
   const router = useRouter()
-  const pathname = usePathname()
+  const [isPending, startTransition] = useTransition()
 
-  const switchLocale = (locale: Locale) => {
-    const localizedPath = getLocalizedPathname(pathname, locale)
-    router.push(localizedPath)
-    router.refresh()
+  const handleLocaleChange = (newLocale: Locale) => {
+    if (newLocale === currentLocale || isPending) return
+    
+    startTransition(async () => {
+      await changeLocale(newLocale)
+      router.refresh()
+    })
   }
 
   return (
     <div className="flex gap-2">
-      {locales.map((locale) => (
+      {locales.map((loc) => (
         <button
-          key={locale}
-          onClick={() => switchLocale(locale)}
-          className="rounded px-3 py-1 text-sm hover:bg-accent"
+          key={loc}
+          onClick={() => handleLocaleChange(loc)}
+          disabled={isPending}
+          className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+            currentLocale === loc
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+          } ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          {locale.toUpperCase()}
+          {loc.toUpperCase()}
         </button>
       ))}
     </div>

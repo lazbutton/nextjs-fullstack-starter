@@ -1,16 +1,17 @@
-import { defaultLocale } from '@/i18n/config'
-import { getTranslations } from '@/lib/i18n'
+import { getLocale } from '@/lib/i18n/cookies'
+import { getTranslationsForCurrentLocale } from '@/lib/i18n'
 import { LocaleSwitcher } from '@/components/locale-switcher'
 
 export default async function Home() {
-  const t = getTranslations(defaultLocale)
+  const locale = await getLocale()
+  const t = await getTranslationsForCurrentLocale()
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-8">
       <div className="w-full max-w-3xl space-y-8">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">{t.common.welcome}</h1>
-          <LocaleSwitcher />
+          <LocaleSwitcher currentLocale={locale} />
         </div>
         
         <div className="space-y-4 rounded-lg border bg-card p-6">
