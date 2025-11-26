@@ -1,0 +1,13 @@
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "hello": "Bonjour",
+    "loading": "Chargement..."
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "signUp": "S'inscrire"
+  }
+}
+
