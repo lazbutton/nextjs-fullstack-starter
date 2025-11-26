@@ -12,6 +12,7 @@ import {
 } from '@/lib/auth/validation'
 import { createErrorResponse } from '@/lib/auth/error-handler'
 import { AUTH_PATHS, AUTH_ERROR_MESSAGES } from '@/lib/auth/constants'
+import { isEmailVerificationEnabled } from '@/lib/auth/config'
 import type { ApiResponse } from '@/types'
 
 /**
@@ -83,9 +84,9 @@ async function handlePostSignUpEmails(
   // Send welcome email
   await sendWelcomeEmail(email)
 
-  // Send verification email if email confirmation is enabled
-  // Supabase may send this automatically, but we send it manually as backup
-  if (userEmail && !hasSession) {
+  // Send verification email if email verification is enabled and user doesn't have a session
+  // Email verification can be disabled via ENABLE_EMAIL_VERIFICATION environment variable
+  if (isEmailVerificationEnabled() && userEmail && !hasSession) {
     await sendVerificationEmail(email)
   }
 }
