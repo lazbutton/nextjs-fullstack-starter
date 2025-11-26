@@ -25,6 +25,8 @@ This document outlines the preferences and conventions for this project.
 - **SEO verification**: Regularly check and optimize SEO (metadata, titles, descriptions, Open Graph tags)
 - **SEO correction**: Fix SEO issues in files when necessary (layout.tsx, page.tsx, etc.)
 - **Documentation check**: Always check recent documentation to stay up-to-date with the latest features, best practices, and API changes for all technologies used in the project
+- **Middleware deprecation**: Next.js 16 shows a deprecation warning for the middleware file convention in favor of "proxy". However, the middleware.ts file is required for Supabase SSR session management. This is a known limitation and the middleware will continue to work despite the warning
+- **Middleware note**: The middleware.ts file is required for Supabase SSR session management. While Next.js 16 shows a deprecation warning in favor of "proxy", the middleware is still necessary and functional for Supabase authentication
 
 ## Code Maintainability & Best Practices
 
