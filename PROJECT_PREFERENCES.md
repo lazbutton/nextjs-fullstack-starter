@@ -26,6 +26,10 @@ This document outlines the preferences and conventions for this project.
 - **SEO correction**: Fix SEO issues in files when necessary (layout.tsx, page.tsx, etc.)
 - **Documentation check**: Always check recent documentation to stay up-to-date with the latest features, best practices, and API changes for all technologies used in the project
 
+## UI/UX Standards
+
+- **Button cursor**: All buttons in the application must have `cursor: pointer` style
+
 ## Stack & Technologies
 
 - Next.js 16 with App Router
