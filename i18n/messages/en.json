@@ -7,7 +7,15 @@
   "auth": {
     "signIn": "Sign In",
     "signOut": "Sign Out",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "createAccount": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "sendResetLink": "Send Reset Link",
+    "updatePassword": "Update Password"
   }
 }
 

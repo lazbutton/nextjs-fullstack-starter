@@ -1,6 +1,7 @@
 import { getLocale } from '@/lib/i18n/cookies'
 import { getTranslationsForCurrentLocale } from '@/lib/i18n'
 import { LocaleSwitcher } from '@/components/locale-switcher'
+import { UserButton } from '@/components/auth/user-button'
 
 export default async function Home() {
   const locale = await getLocale()
@@ -11,7 +12,10 @@ export default async function Home() {
       <div className="w-full max-w-3xl space-y-8">
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">{t.common.welcome}</h1>
-          <LocaleSwitcher currentLocale={locale} />
+          <div className="flex items-center gap-4">
+            <LocaleSwitcher currentLocale={locale} />
+            <UserButton />
+          </div>
         </div>
         
         <div className="space-y-4 rounded-lg border bg-card p-6">
