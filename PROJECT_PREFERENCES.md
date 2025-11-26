@@ -30,6 +30,13 @@ This document outlines the preferences and conventions for this project.
 
 - **Button cursor**: All buttons in the application must have `cursor: pointer` style
 
+## Translations
+
+- **Translation keys**: Only update translation keys in the English (`en.json`) file
+- **Other languages**: The project maintainer manually updates translation keys in other language files (e.g., `fr.json`)
+- **No automatic updates**: Do not automatically add or update translation keys in non-English language files
+- **Structure**: Keep translation keys synchronized in structure, but translations are managed manually
+
 ## Stack & Technologies
 
 - Next.js 16 with App Router

@@ -25,7 +25,7 @@ export function LocaleSwitcher({ currentLocale }: { currentLocale: Locale }) {
           key={loc}
           onClick={() => handleLocaleChange(loc)}
           disabled={isPending}
-          className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+          className={`rounded px-3 py-1 text-sm font-medium transition-colors cursor-pointer ${
             currentLocale === loc
               ? 'bg-primary text-primary-foreground'
               : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
