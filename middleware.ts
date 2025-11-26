@@ -1,3 +1,14 @@
+/**
+ * Middleware for Supabase session management
+ * 
+ * Note: Next.js 16 deprecates the middleware file convention in favor of "proxy".
+ * However, this middleware is required for Supabase SSR session handling.
+ * The middleware ensures user sessions are refreshed and managed correctly.
+ * 
+ * See: https://nextjs.org/docs/messages/middleware-to-proxy
+ * Supabase SSR: https://supabase.com/docs/guides/auth/server-side/nextjs
+ */
+
 import { updateSession } from '@/lib/supabase/middleware'
 import { NextRequest } from 'next/server'
 
