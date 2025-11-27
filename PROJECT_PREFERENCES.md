@@ -28,6 +28,36 @@ This document outlines the preferences and conventions for this project.
 - **Middleware deprecation**: Next.js 16 shows a deprecation warning for the middleware file convention in favor of "proxy". However, the middleware.ts file is required for Supabase SSR session management. This is a known limitation and the middleware will continue to work despite the warning
 - **Middleware note**: The middleware.ts file is required for Supabase SSR session management. While Next.js 16 shows a deprecation warning in favor of "proxy", the middleware is still necessary and functional for Supabase authentication
 
+## Database & Migrations
+
+### Supabase Migrations
+
+- **Regular migrations**: Apply database migrations regularly to keep the schema up-to-date with the codebase
+- **Non-destructive migrations**: All migrations must be non-destructive and backwards-compatible
+  - Use `CREATE TABLE IF NOT EXISTS` instead of `CREATE TABLE`
+  - Use `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` for adding columns
+  - Use `DROP INDEX IF EXISTS` when removing indexes
+  - Always check for existence before dropping tables, columns, or constraints
+- **Migration naming**: Use sequential numbering pattern `XXX_description.sql` (e.g., `001_create_profiles_table.sql`)
+- **Migration order**: Always apply migrations in sequential order (001, 002, 003, etc.)
+- **Rollback safety**: Write migrations that can be safely applied multiple times (idempotent)
+- **Data preservation**: Never drop tables or columns with data without creating a backup or migration plan first
+- **Testing migrations**: Test migrations on a development/staging environment before applying to production
+- **Migration documentation**: Each migration file must include comments explaining what it does and why
+- **Migration location**: All migrations must be placed in `/supabase/migrations/` directory
+- **Version control**: All migration files must be committed to version control
+- **Breaking changes**: If a migration must be destructive, create a separate migration for data migration/backup first, document the breaking change clearly, and coordinate with the team
+
+### Migration Best Practices
+
+- **Additive changes preferred**: Prefer adding new columns/tables over modifying existing ones
+- **Default values**: Always provide default values for new NOT NULL columns added to existing tables
+- **Null safety**: When adding new columns, allow NULL initially, then migrate data, then add NOT NULL constraint if needed
+- **Index management**: Create indexes concurrently to avoid locking production tables
+- **Foreign keys**: Use `ON DELETE CASCADE` or `ON DELETE SET NULL` appropriately to maintain data integrity
+- **Row Level Security**: Always enable RLS on new tables and create appropriate policies
+- **Trigger safety**: Use `CREATE OR REPLACE FUNCTION` and `DROP TRIGGER IF EXISTS` for triggers
+
 ## Code Maintainability & Best Practices
 
 ### Human-Readable Code
@@ -139,11 +169,15 @@ This document outlines the preferences and conventions for this project.
   - **`/components/[feature]`**: Feature-specific components (e.g., `/components/auth/*`)
 - **`/lib`**: Utility functions and configurations
   - **`/lib/[feature]`**: Feature-specific utilities (e.g., `/lib/auth/*`, `/lib/emails/*`)
+  - **`/lib/database/`**: Database utilities and type definitions
 - **`/hooks`**: Custom React hooks
 - **`/types`**: TypeScript type definitions and interfaces
 - **`/i18n`**: Internationalization configuration and translations
 - **`/docs`**: Project documentation
 - **`/public`**: Static assets (images, icons, etc.)
+- **`/supabase`**: Supabase configuration and migrations
+  - **`/supabase/migrations/`**: SQL migration files (numbered sequentially)
+  - **`/supabase/README.md`**: Migration documentation
 
 ### File Naming Conventions
 
