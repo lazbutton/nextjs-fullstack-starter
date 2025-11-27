@@ -23,15 +23,18 @@ export function SignUpForm() {
         setError(result.error || 'An error occurred')
       } else {
         setSuccess(true)
-        // Redirect logic is handled server-side if email verification is disabled
-        // Only show success message if email verification is enabled
+        // Check if email verification is enabled to determine redirect behavior
+        // Note: This is a client-side check using env var
         const emailVerificationEnabled =
           process.env.NEXT_PUBLIC_ENABLE_EMAIL_VERIFICATION !== 'false'
-        if (emailVerificationEnabled) {
-          setTimeout(() => {
-            router.push('/auth/sign-in')
-          }, 2000)
+        
+        // If email verification is disabled, user can sign in immediately
+        if (!emailVerificationEnabled) {
+          // Redirect to home page after successful sign up (no email verification needed)
+          router.push('/')
+          router.refresh()
         }
+        // If email verification is enabled, show success message (handled in render)
       }
     })
   }

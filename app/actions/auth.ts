@@ -68,9 +68,8 @@ export async function signUp(
       // Send welcome email via Resend (Supabase handles verification email automatically)
       await handlePostSignUpEmails(email)
 
-      // If email verification is disabled and user has a session
       // Note: Redirect should be handled client-side to avoid NEXT_REDIRECT errors
-      // The signUpForm will handle the redirect when email verification is disabled
+      // The signUpForm will handle the redirect based on email verification status
     }
 
     return {
