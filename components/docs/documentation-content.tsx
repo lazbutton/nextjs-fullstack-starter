@@ -1,6 +1,7 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Card } from '@/components/ui/card'
+import { CodeBlockWithCopy } from './code-block-with-copy'
 
 /**
  * Documentation content component
@@ -64,11 +65,16 @@ export function DocumentationContent({ content }: { content: string }) {
                 </code>
               )
             },
-            pre: ({ children }) => (
-              <pre className="my-4 overflow-x-auto rounded-lg border bg-muted p-4">
-                {children}
-              </pre>
-            ),
+            pre: ({ children, ...props }) => {
+              // Wrap pre blocks with copy functionality
+              return (
+                <CodeBlockWithCopy>
+                  <pre className="my-4 overflow-x-auto rounded-lg border bg-muted p-4" {...props}>
+                    {children}
+                  </pre>
+                </CodeBlockWithCopy>
+              )
+            },
             a: ({ href, children }) => {
               const isExternal = href?.startsWith('http')
               return (
