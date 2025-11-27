@@ -158,6 +158,7 @@ supabase/      # SQL migrations
 - **[EMAIL_GUIDE.md](docs/EMAIL_GUIDE.md)** - Email guide (Supabase + Resend)
 - **[SEO.md](docs/SEO.md)** - Complete SEO guide and best practices
 - **[SEO_IMPLEMENTATION_SUMMARY.md](SEO_IMPLEMENTATION_SUMMARY.md)** - SEO implementation summary
+- **[GITHUB_SETUP.md](docs/GITHUB_SETUP.md)** - GitHub Actions and Dependabot setup guide
 
 ## Commands
 
