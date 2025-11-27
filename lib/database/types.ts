@@ -51,3 +51,20 @@ export interface UserSettingsUpdate {
   email_notifications_enabled?: boolean
 }
 
+/**
+ * Pagination parameters for optimized queries
+ */
+export interface PaginationParams {
+  page: number
+  pageSize: number
+  offset: number
+}
+
+/**
+ * Sort parameters for optimized queries
+ */
+export interface SortParams {
+  orderBy: string
+  orderDirection: 'asc' | 'desc'
+}
+
