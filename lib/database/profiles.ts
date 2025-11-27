@@ -146,3 +146,37 @@ export async function deleteProfile(userId: string): Promise<boolean> {
   }
 }
 
+/**
+ * Ensure a profile exists for a user
+ * Creates a profile if it doesn't exist, returns existing profile if it does
+ * This is a fallback in case the database trigger doesn't work
+ * @param userId - User ID
+ * @param email - User email
+ * @param fullName - Optional full name
+ * @returns Profile or null on error
+ */
+export async function ensureProfileExists(
+  userId: string,
+  email: string,
+  fullName?: string
+): Promise<Profile | null> {
+  try {
+    // First check if profile already exists
+    const existingProfile = await getProfile(userId)
+    if (existingProfile) {
+      return existingProfile
+    }
+
+    // Profile doesn't exist, create it
+    logger.info(`Creating profile for user ${userId} (trigger may not have fired)`)
+    return await createProfile({
+      id: userId,
+      email,
+      full_name: fullName || null,
+    })
+  } catch (error) {
+    logger.error('Error ensuring profile exists', error)
+    return null
+  }
+}
+

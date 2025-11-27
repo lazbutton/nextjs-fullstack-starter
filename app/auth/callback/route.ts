@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { ensureProfileExists } from '@/lib/database/profiles'
 import { NextResponse } from 'next/server'
 import { type NextRequest } from 'next/server'
 
@@ -9,7 +10,16 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient()
-    await supabase.auth.exchangeCodeForSession(code)
+    const { data } = await supabase.auth.exchangeCodeForSession(code)
+
+    // Ensure profile exists after email verification (fallback if trigger doesn't work)
+    if (data?.user) {
+      await ensureProfileExists(
+        data.user.id,
+        data.user.email || '',
+        data.user.user_metadata?.full_name || undefined
+      )
+    }
   }
 
   // URL to redirect to after sign in process completes

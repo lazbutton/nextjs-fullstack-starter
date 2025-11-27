@@ -12,6 +12,7 @@ import {
 import { createErrorResponse } from '@/lib/auth/error-handler'
 import { AUTH_PATHS, AUTH_ERROR_MESSAGES } from '@/lib/auth/constants'
 import { isEmailVerificationEnabled } from '@/lib/auth/config'
+import { ensureProfileExists } from '@/lib/database/profiles'
 import type { ApiResponse } from '@/types'
 
 /**
@@ -64,6 +65,14 @@ export async function signUp(
     }
 
     if (data.user) {
+      // Ensure profile exists (fallback if database trigger doesn't work)
+      // The trigger should create it automatically, but we ensure it exists explicitly
+      await ensureProfileExists(
+        data.user.id,
+        email,
+        data.user.user_metadata?.full_name || undefined
+      )
+
       // Send welcome email via Resend (Supabase handles verification email automatically)
       await handlePostSignUpEmails(email)
 
@@ -125,6 +134,14 @@ export async function signIn(
     }
 
     if (data.user) {
+      // Ensure profile exists (fallback if database trigger doesn't work)
+      // This handles cases where existing users don't have profiles yet
+      await ensureProfileExists(
+        data.user.id,
+        email,
+        data.user.user_metadata?.full_name || undefined
+      )
+
       revalidatePath(AUTH_PATHS.HOME, 'layout')
       // Return success - redirect will be handled client-side
       return {
