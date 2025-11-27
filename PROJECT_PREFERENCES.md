@@ -30,10 +30,23 @@ This document outlines the preferences and conventions for this project.
 
 ## Database & Migrations
 
+### Database Best Practices
+
+- **Follow best practices**: Always follow PostgreSQL and Supabase best practices for schema design, performance, and security
+- **DRY principle (Don't Repeat Yourself)**: Minimize repetition in database schema and migrations
+  - Extract common patterns into reusable functions
+  - Use views or materialized views for repeated queries
+  - Create utility functions for common operations
+  - Share common constraints and defaults
+  - Document patterns to reuse across migrations
+- **Consistent patterns**: Use consistent naming conventions, data types, and patterns across all tables
+- **Normalization**: Follow database normalization principles to avoid data redundancy
+- **Documentation**: Document database schema, relationships, and business logic clearly
+
 ### Supabase Migrations
 
 - **Regular migrations**: Apply database migrations regularly to keep the schema up-to-date with the codebase
-- **Non-destructive migrations**: All migrations must be non-destructive and backwards-compatible
+- **Non-destructive migrations**: All migrations must be non-destructive and backwards-compatible whenever possible
   - Use `CREATE TABLE IF NOT EXISTS` instead of `CREATE TABLE`
   - Use `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` for adding columns
   - Use `DROP INDEX IF EXISTS` when removing indexes
@@ -46,7 +59,27 @@ This document outlines the preferences and conventions for this project.
 - **Migration documentation**: Each migration file must include comments explaining what it does and why
 - **Migration location**: All migrations must be placed in `/supabase/migrations/` directory
 - **Version control**: All migration files must be committed to version control
-- **Breaking changes**: If a migration must be destructive, create a separate migration for data migration/backup first, document the breaking change clearly, and coordinate with the team
+
+### Destructive Migrations & Data Recovery
+
+- **Avoid destructive changes**: Always prefer non-destructive migrations when possible
+- **Destructive migration protocol**: If a destructive migration is absolutely necessary, follow this mandatory process:
+  1. **Data export/backup**: Create a data export script or backup migration BEFORE the destructive change
+     - Export data to SQL dump, CSV, or backup table
+     - Create a separate migration file for data export (e.g., `XXX_backup_table_name_data.sql`)
+     - Store export in `/supabase/backups/` directory if needed
+  2. **Documentation**: Clearly document in the migration file:
+     - What data is being removed or modified
+     - Why the destructive change is necessary
+     - How to restore/reimport the data if needed
+     - Any data transformation required before reimport
+  3. **Data reimport capability**: Provide a reimport script or migration that allows restoring the exported data
+     - Create a companion migration for data reimport (e.g., `XXX_restore_table_name_data.sql`)
+     - Document the reimport process clearly
+     - Test the reimport process in development before deploying
+  4. **Breaking change coordination**: Coordinate destructive migrations with the team and document breaking changes clearly
+- **Data export format**: Use standardized formats for data exports (SQL INSERT statements, CSV with proper encoding, or JSON)
+- **Verification**: After destructive migrations, verify that data can be successfully reimported in a test environment
 
 ### Migration Best Practices
 
@@ -57,6 +90,7 @@ This document outlines the preferences and conventions for this project.
 - **Foreign keys**: Use `ON DELETE CASCADE` or `ON DELETE SET NULL` appropriately to maintain data integrity
 - **Row Level Security**: Always enable RLS on new tables and create appropriate policies
 - **Trigger safety**: Use `CREATE OR REPLACE FUNCTION` and `DROP TRIGGER IF EXISTS` for triggers
+- **Function reuse**: Extract common database logic into reusable PostgreSQL functions to avoid code duplication
 
 ## Code Maintainability & Best Practices
 
@@ -177,6 +211,7 @@ This document outlines the preferences and conventions for this project.
 - **`/public`**: Static assets (images, icons, etc.)
 - **`/supabase`**: Supabase configuration and migrations
   - **`/supabase/migrations/`**: SQL migration files (numbered sequentially)
+  - **`/supabase/backups/`**: Data backup/export files (for destructive migrations)
   - **`/supabase/README.md`**: Migration documentation
 
 ### File Naming Conventions
