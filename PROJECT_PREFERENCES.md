@@ -74,6 +74,7 @@ Si absolument nécessaire :
 - **Fichiers de documentation** : Tous les fichiers de documentation (`.md`) doivent être rédigés en anglais
 - **Fichiers concernés** : `README.md`, tous les fichiers dans `/docs/`, `ENV.md`, etc.
 - **Commentaires dans le code** : Toujours en anglais (voir section "Traductions")
+- **Masquer des fichiers** : Préfixer avec `_` ou `.` pour les exclure de la documentation (ex: `_HIDDEN.md`, `.private.md`)
 
 ## Stack & Technos
 

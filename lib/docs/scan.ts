@@ -26,6 +26,11 @@ export async function scanDocumentationFiles(): Promise<DocFile[]> {
     const docsFiles = await readdir(docsDir)
     
     for (const file of docsFiles) {
+      // Skip hidden files (starting with _ or .)
+      if (file.startsWith('_') || file.startsWith('.')) {
+        continue
+      }
+      
       if (file.endsWith('.md') && file !== 'README.md') {
         const filePath = join(docsDir, file)
         const stats = await stat(filePath)
@@ -65,6 +70,11 @@ export async function scanDocumentationFiles(): Promise<DocFile[]> {
     const allowedRootFiles = ['README.md', 'PROJECT_PREFERENCES.md', 'ENV.md']
     
     for (const file of rootFiles) {
+      // Skip hidden files (starting with _ or .)
+      if (file.startsWith('_') || file.startsWith('.')) {
+        continue
+      }
+      
       if (allowedRootFiles.includes(file) && file.endsWith('.md')) {
         const filePath = join(rootDir, file)
         const stats = await stat(filePath)
