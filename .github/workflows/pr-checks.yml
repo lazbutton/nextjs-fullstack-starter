@@ -5,29 +5,49 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  pr-labels:
-    name: PR Label Check
+  pr-quality:
+    name: PR Quality Check
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     timeout-minutes: 2
+    continue-on-error: true
     
     steps:
-      - name: Check PR title
+      - name: Check PR title format
+        id: check_title
         run: |
           PR_TITLE="${{ github.event.pull_request.title }}"
           echo "PR Title: $PR_TITLE"
           
           # Check for conventional commits format
-          if ! echo "$PR_TITLE" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\(.+\))?:'; then
+          if echo "$PR_TITLE" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\(.+\))?:'; then
+            echo "✅ PR title follows conventional commits format"
+            echo "title_ok=true" >> $GITHUB_OUTPUT
+          else
             echo "⚠️  PR title doesn't follow conventional commits format"
             echo "Consider using: feat(scope): description"
+            echo "title_ok=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Check PR description
+        id: check_description
         run: |
           PR_BODY="${{ github.event.pull_request.body }}"
           if [ -z "$PR_BODY" ] || [ "$PR_BODY" = "null" ]; then
             echo "⚠️  PR description is empty"
             echo "Please add a description explaining the changes"
+            echo "description_ok=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ PR description is present"
+            echo "description_ok=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: Summary
+        run: |
+          echo "## PR Quality Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Title format: ${{ steps.check_title.outputs.title_ok }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Description: ${{ steps.check_description.outputs.description_ok }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ Note: These checks are informational and will not block merging." >> $GITHUB_STEP_SUMMARY
 
