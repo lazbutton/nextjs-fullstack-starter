@@ -22,19 +22,17 @@ export function SignUpForm() {
       if (!result.success) {
         setError(result.error || 'An error occurred')
       } else {
-        setSuccess(true)
-        // Check if email verification is enabled to determine redirect behavior
-        // Note: This is a client-side check using env var
-        const emailVerificationEnabled =
-          process.env.NEXT_PUBLIC_ENABLE_EMAIL_VERIFICATION !== 'false'
-        
-        // If email verification is disabled, user can sign in immediately
-        if (!emailVerificationEnabled) {
-          // Redirect to home page after successful sign up (no email verification needed)
+        // Check if user is automatically logged in (when email verification is disabled)
+        if (result.data?.autoLogin) {
+          // User is automatically logged in - redirect immediately
+          // Session is already active from server-side signup
           router.push('/')
           router.refresh()
+          return // Don't show success message, just redirect
         }
-        // If email verification is enabled, show success message (handled in render)
+        
+        // Otherwise show success message (email verification required)
+        setSuccess(true)
       }
     })
   }
@@ -60,16 +58,17 @@ export function SignUpForm() {
         </Card>
       )
     } else {
-      // Email verification disabled - user can sign in immediately
+      // This case should not happen if auto-login works correctly
+      // But keeping it as fallback in case email verification was just disabled
       return (
         <Card>
           <CardHeader>
             <CardTitle>Account created successfully!</CardTitle>
-            <CardDescription>You can now sign in to your account</CardDescription>
+            <CardDescription>Please sign in to continue</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Your account has been created. You can sign in immediately.
+              Your account has been created. Please sign in to continue.
             </p>
             <Button onClick={() => router.push('/auth/sign-in')} className="w-full">
               Go to Sign In

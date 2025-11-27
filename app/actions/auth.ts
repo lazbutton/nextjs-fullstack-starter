@@ -20,10 +20,11 @@ import type { ApiResponse } from '@/types'
  * Creates a new user account and sends welcome/verification emails
  * @param formData - Form data containing email and password
  * @returns API response with user email on success, error message on failure
+ * When email verification is disabled, includes autoLogin flag to indicate user is logged in
  */
 export async function signUp(
   formData: FormData
-): Promise<ApiResponse<{ email: string }>> {
+): Promise<ApiResponse<{ email: string; autoLogin?: boolean }>> {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
@@ -65,8 +66,8 @@ export async function signUp(
     }
 
     if (data.user) {
-      // Ensure profile exists (fallback if database trigger doesn't work)
-      // The trigger should create it automatically, but we ensure it exists explicitly
+      // Ensure profile exists in database (wait for it to be created)
+      // This must complete before considering the user logged in
       await ensureProfileExists(
         data.user.id,
         email,
@@ -76,8 +77,19 @@ export async function signUp(
       // Send welcome email via Resend (Supabase handles verification email automatically)
       await handlePostSignUpEmails(email)
 
-      // Note: Redirect should be handled client-side to avoid NEXT_REDIRECT errors
-      // The signUpForm will handle the redirect based on email verification status
+      // If email verification is disabled and user has a session, they are automatically logged in
+      // The session is created by Supabase when auto-confirm is enabled
+      if (!emailVerificationEnabled && data.session) {
+        revalidatePath(AUTH_PATHS.HOME, 'layout')
+        // Return autoLogin flag so client knows to redirect immediately
+        return {
+          success: true,
+          data: { 
+            email,
+            autoLogin: true, // Indicates user is automatically logged in
+          },
+        }
+      }
     }
 
     return {
