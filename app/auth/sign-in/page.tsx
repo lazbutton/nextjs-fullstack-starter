@@ -4,7 +4,17 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Sign In',
-  description: 'Sign in to your account',
+  description: 'Sign in to your account to access your dashboard and manage your application.',
+  keywords: ['sign in', 'login', 'authentication', 'user account'],
+  openGraph: {
+    title: 'Sign In - Next.js Template',
+    description: 'Sign in to your account to access your dashboard.',
+    type: 'website',
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
 }
 
 export default function SignInPage() {

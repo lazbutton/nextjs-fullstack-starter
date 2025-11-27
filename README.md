@@ -71,6 +71,18 @@ Modern Next.js template with TypeScript, Supabase, shadcn/ui and Resend.
 - ✅ Authentication emails (Supabase)
 - ✅ Hybrid configuration (Supabase + Resend)
 
+#### SEO & Performance
+
+- ✅ Dynamic sitemap generation (`/sitemap.xml`)
+- ✅ Robots.txt configuration
+- ✅ Comprehensive metadata (Open Graph, Twitter Cards)
+- ✅ JSON-LD structured data (WebSite, Article, Breadcrumb)
+- ✅ PWA manifest (`/manifest.webmanifest`)
+- ✅ Search engine verification support
+- ✅ Image optimization (AVIF, WebP)
+- ✅ Security headers
+- ✅ Compression enabled
+
 ### 🚧 To be implemented
 
 #### High Priority
@@ -87,6 +99,7 @@ Modern Next.js template with TypeScript, Supabase, shadcn/ui and Resend.
 - ⏳ Rate Limiting on Server Actions
 - ⏳ Analytics & Monitoring (Sentry, Google Analytics)
 - ⏳ Typed environment variables (Zod validation)
+- ⏳ OG Image generation (dynamic Open Graph images)
 
 #### Low Priority
 
@@ -104,12 +117,16 @@ Modern Next.js template with TypeScript, Supabase, shadcn/ui and Resend.
 git clone <your-repo-url>
 npm install
 
-# 2. Configure .env.local
+# 2. Configure .env.local (copy from .env.example)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Optional: SEO verification codes
+NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your_code
+NEXT_PUBLIC_YANDEX_VERIFICATION=your_code
+NEXT_PUBLIC_BING_VERIFICATION=your_code
 
 # 3. Apply database migrations (see docs/DATABASE.md)
 # 4. Run
@@ -139,6 +156,8 @@ supabase/      # SQL migrations
 - **[AUTHENTICATION.md](docs/AUTHENTICATION.md)** - Authentication system
 - **[DATABASE_PERFORMANCE.md](docs/DATABASE_PERFORMANCE.md)** - Performance optimization
 - **[EMAIL_GUIDE.md](docs/EMAIL_GUIDE.md)** - Email guide (Supabase + Resend)
+- **[SEO.md](docs/SEO.md)** - Complete SEO guide and best practices
+- **[SEO_IMPLEMENTATION_SUMMARY.md](SEO_IMPLEMENTATION_SUMMARY.md)** - SEO implementation summary
 
 ## Commands
 

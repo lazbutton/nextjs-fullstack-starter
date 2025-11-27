@@ -1,5 +1,18 @@
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { DashboardHeader } from '@/components/dashboard/header'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Dashboard',
+    template: '%s | Dashboard',
+  },
+  description: 'Manage your application from your personal dashboard.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 /**
  * Dashboard layout

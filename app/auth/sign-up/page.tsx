@@ -4,7 +4,17 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Sign Up',
-  description: 'Create a new account',
+  description: 'Create a new account to start building your application with our modern Next.js template.',
+  keywords: ['sign up', 'register', 'create account', 'new user'],
+  openGraph: {
+    title: 'Sign Up - Next.js Template',
+    description: 'Create a new account to get started with our platform.',
+    type: 'website',
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
 }
 
 export default function SignUpPage() {

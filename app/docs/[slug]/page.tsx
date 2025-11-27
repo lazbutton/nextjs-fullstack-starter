@@ -8,10 +8,64 @@ import Link from 'next/link'
 import { DocsSidebar } from '@/components/docs/docs-sidebar'
 import { DocumentationContent } from '@/components/docs/documentation-content'
 import { scanDocumentationFiles } from '@/lib/docs/scan'
+import { StructuredData } from '@/components/seo/structured-data'
+import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo/structured-data'
 
-export const metadata: Metadata = {
-  title: 'Documentation',
-  description: 'Complete documentation for the Next.js Template',
+/**
+ * Generate dynamic metadata for each documentation page
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const docs = await scanDocumentationFiles()
+  const doc = docs.find((d) => d.slug === slug)
+  
+  if (!doc) {
+    return {
+      title: 'Documentation Not Found',
+      description: 'The requested documentation page could not be found.',
+    }
+  }
+  
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  
+  return {
+    title: doc.title,
+    description: doc.description,
+    keywords: ['Next.js', 'Documentation', 'Guide', doc.title],
+    authors: [{ name: 'Your Name', url: baseUrl }],
+    openGraph: {
+      title: `${doc.title} - Documentation`,
+      description: doc.description,
+      type: 'article',
+      url: `${baseUrl}/docs/${slug}`,
+      siteName: 'Next.js Template',
+      images: [
+        {
+          url: `${baseUrl}/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `${doc.title} - Documentation`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${doc.title} - Documentation`,
+      description: doc.description,
+      images: [`${baseUrl}/og-image.png`],
+    },
+    alternates: {
+      canonical: `${baseUrl}/docs/${slug}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  }
 }
 
 /**
@@ -58,8 +112,24 @@ export default async function DocumentationPage({
     docContent = `# ${activeDocConfig.title}\n\nUnable to load documentation file: ${activeDocConfig.path}`
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  
+  // Generate structured data for SEO
+  const articleStructuredData = generateArticleStructuredData(
+    activeDocConfig.title,
+    activeDocConfig.description,
+    slug
+  )
+  
+  const breadcrumbStructuredData = generateBreadcrumbStructuredData([
+    { name: 'Home', url: baseUrl },
+    { name: 'Documentation', url: `${baseUrl}/docs` },
+    { name: activeDocConfig.title, url: `${baseUrl}/docs/${slug}` },
+  ])
+
   return (
     <SiteLayout>
+      <StructuredData data={[articleStructuredData, breadcrumbStructuredData]} />
       <div className="flex h-[calc(100vh-3.5rem)]">
         <DocsSidebar docs={docs} />
         <div className="ml-64 flex flex-1 flex-col overflow-hidden">
