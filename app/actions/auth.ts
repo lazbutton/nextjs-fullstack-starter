@@ -41,13 +41,23 @@ export async function signUp(
   try {
     const supabase = await createClient()
     const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL}${AUTH_PATHS.CALLBACK}`
+    const emailVerificationEnabled = isEmailVerificationEnabled()
+
+    const signUpOptions: {
+      emailRedirectTo?: string
+      data?: Record<string, unknown>
+    } = {}
+
+    // Only set emailRedirectTo if email verification is enabled
+    // When disabled, Supabase should auto-confirm the email (configured in Supabase Dashboard)
+    if (emailVerificationEnabled) {
+      signUpOptions.emailRedirectTo = callbackUrl
+    }
 
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: callbackUrl,
-      },
+      options: signUpOptions,
     })
 
     if (error) {
@@ -56,6 +66,12 @@ export async function signUp(
 
     if (data.user) {
       await handlePostSignUpEmails(email, data.user.email, !!data.session)
+
+      // If email verification is disabled and user has a session, redirect immediately
+      if (!emailVerificationEnabled && data.session) {
+        revalidatePath(AUTH_PATHS.HOME, 'layout')
+        redirect(AUTH_PATHS.HOME)
+      }
     }
 
     return {

@@ -193,7 +193,20 @@ The `ENABLE_EMAIL_VERIFICATION` variable controls whether verification emails ar
 - **`false` or `0`**: Email verification disabled
 - **Not set**: Defaults to `true` (secure by default)
 
-When disabled, users can sign in immediately after registration without verifying their email first. This is useful for development or when email verification is handled entirely by Supabase.
+**Important**: When `ENABLE_EMAIL_VERIFICATION` is set to `false`, you must also configure Supabase to auto-confirm email addresses:
+
+1. Go to your Supabase Dashboard
+2. Navigate to **Authentication** > **Providers** > **Email**
+3. Enable **"Confirm email"** setting
+4. **IMPORTANT**: Also enable **"Auto Confirm"** to allow users to sign in immediately without email verification
+
+When email verification is disabled:
+- Users can sign in immediately after registration (no email verification required)
+- No verification email is sent via Resend
+- Users are automatically redirected to the home page after signup
+- This is useful for development or when you want to skip email verification
+
+**Note**: If `ENABLE_EMAIL_VERIFICATION=false` but Supabase is not configured for auto-confirm, users will not receive a session and will see an error message. Make sure both settings are aligned.
 
 ## Supabase Configuration
 
