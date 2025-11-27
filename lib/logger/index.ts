@@ -45,7 +45,7 @@ class Logger {
       return
     }
 
-    const formattedMessage = this.formatMessage(level, message, ...args)
+    const formattedMessage = this.formatMessage(level, message)
 
     if (this.config.enableConsole) {
       switch (level) {
