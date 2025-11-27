@@ -26,6 +26,12 @@ export async function Header() {
               Home
             </Link>
             <Link
+              href="/docs"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Documentation
+            </Link>
+            <Link
               href="/dashboard"
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
