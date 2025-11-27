@@ -92,6 +92,52 @@ This document outlines the preferences and conventions for this project.
 - **Trigger safety**: Use `CREATE OR REPLACE FUNCTION` and `DROP TRIGGER IF EXISTS` for triggers
 - **Function reuse**: Extract common database logic into reusable PostgreSQL functions to avoid code duplication
 
+### Database Performance Optimization
+
+- **Indexes are essential**: Always create indexes for frequently queried columns
+  - Create indexes on columns used in WHERE clauses
+  - Create indexes on columns used in ORDER BY clauses
+  - Create composite indexes for multi-column queries
+  - Use unique indexes for columns that should be unique (e.g., email)
+- **Index best practices**:
+  - Use `CREATE INDEX IF NOT EXISTS` for idempotent migrations
+  - Create DESC indexes for reverse chronological sorting
+  - Use partial indexes (WHERE clauses) for filtered queries on nullable columns
+  - Add indexes on foreign keys for join performance
+  - Consider text pattern indexes (text_pattern_ops) for LIKE/ILIKE queries
+- **Query optimization**:
+  - Always use indexed columns in WHERE clauses when possible
+  - Use LIMIT to avoid fetching unnecessary data
+  - Select only needed columns instead of `SELECT *`
+  - Leverage composite indexes for multi-column queries
+  - Use pagination for large result sets
+  - Avoid full table scans - always query by indexed columns
+- **Performance monitoring**:
+  - Monitor index usage with `pg_stat_user_indexes`
+  - Use `EXPLAIN ANALYZE` to verify query plans use indexes
+  - Log slow queries for optimization
+  - Update statistics regularly with `ANALYZE`
+- **Index maintenance**:
+  - Reindex periodically if performance degrades
+  - Use `REINDEX CONCURRENTLY` in production to avoid locking
+  - Monitor index bloat and rebuild when necessary
+- **Performance targets**:
+  - Email/ID lookups: < 1ms (unique/primary key indexes)
+  - Paginated lists: < 10ms (composite indexes)
+  - Text searches: < 50ms (pattern indexes)
+  - Date range queries: < 20ms (date indexes)
+- **Optimization priority**:
+  1. Index frequently queried columns first
+  2. Optimize queries that run on every request
+  3. Optimize queries that return large result sets
+  4. Profile slow queries and optimize them systematically
+- **Avoid performance anti-patterns**:
+  - ❌ Don't query unindexed columns in WHERE clauses
+  - ❌ Don't fetch all rows when you only need a subset
+  - ❌ Don't select all columns when you only need a few
+  - ❌ Don't create unnecessary indexes (they slow down writes)
+  - ❌ Don't ignore query planning - verify indexes are used
+
 ## Code Maintainability & Best Practices
 
 ### Human-Readable Code
@@ -213,6 +259,9 @@ This document outlines the preferences and conventions for this project.
   - **`/supabase/migrations/`**: SQL migration files (numbered sequentially)
   - **`/supabase/backups/`**: Data backup/export files (for destructive migrations)
   - **`/supabase/README.md`**: Migration documentation
+- **`/docs`**: Project documentation
+  - **`/docs/DATABASE.md`**: Database setup guide
+  - **`/docs/DATABASE_PERFORMANCE.md`**: Database performance optimization guide
 
 ### File Naming Conventions
 
