@@ -15,7 +15,7 @@ export function DocsSidebar({ docs }: { docs: DocFile[] }) {
   const currentSlug = pathname.split('/').pop() || 'readme'
 
   return (
-    <aside className="w-64 border-r bg-background">
+    <aside className="fixed top-14 left-0 bottom-0 z-30 w-64 border-r bg-background">
       <div className="flex h-full flex-col">
         <div className="flex h-16 items-center border-b px-6">
           <Link href="/docs/readme" className="flex items-center space-x-2">

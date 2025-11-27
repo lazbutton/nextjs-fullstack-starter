@@ -60,10 +60,10 @@ export default async function DocumentationPage({
 
   return (
     <SiteLayout>
-      <div className="flex min-h-screen">
+      <div className="flex h-[calc(100vh-3.5rem)]">
         <DocsSidebar docs={docs} />
-        <div className="flex flex-1 flex-col">
-          <div className="border-b bg-background">
+        <div className="ml-64 flex flex-1 flex-col overflow-hidden">
+          <div className="fixed top-14 left-64 right-0 z-40 border-b bg-background">
             <div className="container mx-auto flex items-center justify-between px-6 py-4">
               <div>
                 <h1 className="text-2xl font-bold">{activeDocConfig.title}</h1>
@@ -82,7 +82,7 @@ export default async function DocumentationPage({
               </Link>
             </div>
           </div>
-          <main className="flex-1 overflow-y-auto">
+          <main className="flex-1 overflow-y-auto pt-[73px]">
             <div className="container mx-auto max-w-4xl px-6 py-8">
               <DocumentationContent content={docContent} />
             </div>
