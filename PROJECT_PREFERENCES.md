@@ -2,6 +2,7 @@
 
 ## Git & Code
 
+- **Branche main** : Vérifier qu'elle est à jour avant chaque modification (`git pull origin main` ou `git fetch && git rebase origin/main`)
 - **Commits** : Messages en anglais, clairs et descriptifs
 - **Comments** : Tous les commentaires en anglais
 - **TypeScript** : Mode strict activé
