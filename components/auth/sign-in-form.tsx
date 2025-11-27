@@ -19,6 +19,10 @@ export function SignInForm() {
       const result = await signIn(formData)
       if (!result.success) {
         setError(result.error || 'An error occurred')
+      } else {
+        // Redirect on successful sign in
+        router.push('/')
+        router.refresh()
       }
     })
   }

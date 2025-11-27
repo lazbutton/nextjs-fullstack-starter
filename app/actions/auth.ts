@@ -68,11 +68,9 @@ export async function signUp(
       // Send welcome email via Resend (Supabase handles verification email automatically)
       await handlePostSignUpEmails(email)
 
-      // If email verification is disabled and user has a session, redirect immediately
-      if (!emailVerificationEnabled && data.session) {
-        revalidatePath(AUTH_PATHS.HOME, 'layout')
-        redirect(AUTH_PATHS.HOME)
-      }
+      // If email verification is disabled and user has a session
+      // Note: Redirect should be handled client-side to avoid NEXT_REDIRECT errors
+      // The signUpForm will handle the redirect when email verification is disabled
     }
 
     return {
@@ -130,7 +128,11 @@ export async function signIn(
 
     if (data.user) {
       revalidatePath(AUTH_PATHS.HOME, 'layout')
-      redirect(AUTH_PATHS.HOME)
+      // Return success - redirect will be handled client-side
+      return {
+        success: true,
+        data: { email },
+      }
     }
 
     return {
@@ -147,13 +149,26 @@ export async function signIn(
 
 /**
  * Handles user sign out
- * Ends the current user session and redirects to sign in page
+ * Ends the current user session
+ * Note: Redirect should be handled client-side to avoid NEXT_REDIRECT errors
  */
-export async function signOut(): Promise<void> {
-  const supabase = await createClient()
-  await supabase.auth.signOut()
-  revalidatePath(AUTH_PATHS.HOME, 'layout')
-  redirect(AUTH_PATHS.SIGN_IN)
+export async function signOut(): Promise<ApiResponse<void>> {
+  try {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      return createErrorResponse(error, 'Failed to sign out')
+    }
+
+    revalidatePath(AUTH_PATHS.HOME, 'layout')
+    return {
+      success: true,
+      data: undefined,
+    }
+  } catch (error) {
+    return createErrorResponse(error, 'Failed to sign out')
+  }
 }
 
 /**
@@ -232,7 +247,11 @@ export async function updatePassword(
     }
 
     revalidatePath(AUTH_PATHS.HOME, 'layout')
-    redirect(AUTH_PATHS.HOME)
+    // Return success - redirect will be handled client-side to avoid NEXT_REDIRECT errors
+    return {
+      success: true,
+      data: undefined,
+    }
   } catch (error) {
     return createErrorResponse(
       error,

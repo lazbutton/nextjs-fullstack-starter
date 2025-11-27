@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { updatePassword } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function ResetPasswordForm() {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -17,6 +19,10 @@ export function ResetPasswordForm() {
       const result = await updatePassword(formData)
       if (!result.success) {
         setError(result.error || 'An error occurred')
+      } else {
+        // Redirect on successful password update
+        router.push('/')
+        router.refresh()
       }
     })
   }

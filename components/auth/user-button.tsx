@@ -25,17 +25,19 @@ export function UserButton() {
   }
 
   const handleSignOut = async () => {
-    await signOut()
+    const result = await signOut()
+    if (result?.success) {
+      router.push('/auth/sign-in')
+      router.refresh()
+    }
   }
 
   return (
     <div className="flex items-center gap-4">
       <span className="text-sm text-muted-foreground">{user.email}</span>
-      <form action={handleSignOut}>
-        <Button type="submit" variant="outline">
-          Sign Out
-        </Button>
-      </form>
+      <Button onClick={handleSignOut} variant="outline">
+        Sign Out
+      </Button>
     </div>
   )
 }
