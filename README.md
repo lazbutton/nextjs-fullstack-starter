@@ -8,7 +8,7 @@ A modern Next.js template built with TypeScript, Supabase, shadcn/ui, and Resend
 - 🔷 **TypeScript** with strict mode
 - 🗄️ **Supabase** (PostgreSQL + Authentication)
 - 🎨 **shadcn/ui** components
-- 📧 **Resend** for email handling
+- 📧 **Hybrid Email System** (Supabase for auth emails + Resend for welcome emails)
 - 🔐 **Server Actions** for form handling
 - 🛡️ **Middleware** for route protection
 - 🌍 **Translation** support (en, fr)

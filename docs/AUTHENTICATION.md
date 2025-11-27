@@ -27,12 +27,18 @@ All authentication logic is handled via Server Actions:
 - `updatePassword()` - Update user password
 - `getCurrentUser()` - Get current authenticated user
 
-### Email Templates (`lib/emails/`)
+### Email System (Hybrid Approach)
 
-Email templates for:
-- Welcome email - Sent after user registration
-- Verification email - Sent for email verification (if enabled in Supabase)
-- Password reset email - Sent when user requests password reset
+The project uses a hybrid email approach:
+
+**Supabase** handles automatically:
+- Email verification - Sent automatically during sign up
+- Password reset email - Sent automatically when requested
+
+**Resend** handles:
+- Welcome email - Personalized welcome email sent after registration
+
+This approach provides the best of both worlds: robust auth emails via Supabase and personalized branding via Resend. See `/docs/HYBRID_EMAIL_APPROACH.md` for details.
 
 ### Pages
 

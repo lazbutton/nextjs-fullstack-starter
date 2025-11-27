@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { sendWelcomeEmail, sendVerificationEmail, sendPasswordResetEmail } from '@/lib/emails'
+import { sendWelcomeEmail } from '@/lib/emails'
 import {
   validateEmail,
   validateEmailAndPassword,
@@ -65,7 +65,8 @@ export async function signUp(
     }
 
     if (data.user) {
-      await handlePostSignUpEmails(email, data.user.email, !!data.session)
+      // Send welcome email via Resend (Supabase handles verification email automatically)
+      await handlePostSignUpEmails(email)
 
       // If email verification is disabled and user has a session, redirect immediately
       if (!emailVerificationEnabled && data.session) {
@@ -87,24 +88,14 @@ export async function signUp(
 }
 
 /**
- * Sends welcome and verification emails after user sign up
+ * Sends welcome email after user sign up
+ * Note: Email verification is handled automatically by Supabase
  * @param email - User email address
- * @param userEmail - Email from user object
- * @param hasSession - Whether user has an active session
  */
-async function handlePostSignUpEmails(
-  email: string,
-  userEmail: string | undefined,
-  hasSession: boolean
-): Promise<void> {
-  // Send welcome email
+async function handlePostSignUpEmails(email: string): Promise<void> {
+  // Send welcome email via Resend (personalized)
+  // Email verification is handled automatically by Supabase when emailRedirectTo is set
   await sendWelcomeEmail(email)
-
-  // Send verification email if email verification is enabled and user doesn't have a session
-  // Email verification can be disabled via ENABLE_EMAIL_VERIFICATION environment variable
-  if (isEmailVerificationEnabled() && userEmail && !hasSession) {
-    await sendVerificationEmail(email)
-  }
 }
 
 /**
@@ -186,6 +177,7 @@ export async function resetPassword(
     const supabase = await createClient()
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}${AUTH_PATHS.RESET_PASSWORD}`
 
+    // Supabase automatically sends password reset email with the redirect URL
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: resetUrl,
     })
@@ -194,8 +186,9 @@ export async function resetPassword(
       return createErrorResponse(error, 'Failed to send password reset email')
     }
 
-    // Send password reset email
-    await sendPasswordResetEmail(email)
+    // Note: Password reset email is sent automatically by Supabase
+    // We don't send a custom email via Resend to avoid duplicates
+    // If you want a custom email, configure email templates in Supabase Dashboard
 
     return {
       success: true,
