@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { UserButton } from '@/components/auth/user-button'
 import { LocaleSwitcher } from '@/components/locale-switcher'
 import { getLocale } from '@/lib/i18n/cookies'
-import { Button } from '@/components/ui/button'
 
 /**
  * Site header component

@@ -19,12 +19,14 @@ export function CodeBlockWithCopy({
     if (preRef.current) {
       // Find the code element inside pre
       const codeElement = preRef.current.querySelector('code')
-      if (codeElement) {
-        setCodeText(codeElement.textContent || '')
-      } else {
-        // Fallback: get text from pre itself
-        setCodeText(preRef.current.textContent || '')
-      }
+      const textContent = codeElement 
+        ? codeElement.textContent || '' 
+        : preRef.current.textContent || ''
+      
+      // Use requestAnimationFrame to avoid setState in effect
+      requestAnimationFrame(() => {
+        setCodeText(textContent)
+      })
     }
   }, [children])
 

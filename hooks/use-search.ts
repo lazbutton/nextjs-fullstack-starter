@@ -30,7 +30,10 @@ export function useSearch({
   const [isSearching, setIsSearching] = useState(false)
 
   useEffect(() => {
-    setIsSearching(true)
+    // Use requestAnimationFrame to avoid setState in effect
+    requestAnimationFrame(() => {
+      setIsSearching(true)
+    })
 
     const timer = setTimeout(() => {
       setDebouncedQuery(query)

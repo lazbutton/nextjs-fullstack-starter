@@ -23,7 +23,7 @@ interface QueryOptions {
  * @param options - Query options (limit, offset, ordering)
  * @returns Optimized query builder chain
  */
-export function buildOptimizedQuery<T>(
+export function buildOptimizedQuery(
   tableName: string,
   selectFields: string = '*',
   filters?: Record<string, unknown>,

@@ -27,7 +27,7 @@ export function getErrorMessage(
  * @param defaultMessage - Default error message
  * @returns Standardized error response
  */
-export function createErrorResponse<T>(
+export function createErrorResponse(
   error: unknown,
   defaultMessage: string
 ): { success: false; error: string } {

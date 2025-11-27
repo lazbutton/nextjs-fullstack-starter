@@ -1,4 +1,4 @@
-import { defaultLocale, locales, type Locale } from '@/i18n/config'
+import { locales, type Locale } from '@/i18n/config'
 import { getLocale } from './i18n/cookies'
 
 // Import translation files

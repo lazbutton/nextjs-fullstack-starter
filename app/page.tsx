@@ -1,4 +1,3 @@
-import { getLocale } from '@/lib/i18n/cookies'
 import { getTranslationsForCurrentLocale } from '@/lib/i18n'
 import { SiteLayout } from '@/components/layout/site-layout'
 import type { Metadata } from 'next'
@@ -23,7 +22,6 @@ export const metadata: Metadata = {
 }
 
 export default async function Home() {
-  const locale = await getLocale()
   const t = await getTranslationsForCurrentLocale()
 
   return (

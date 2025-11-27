@@ -48,7 +48,7 @@ export function SignUpForm() {
         <Card>
           <CardHeader>
             <CardTitle>Check your email</CardTitle>
-            <CardDescription>We've sent you a verification link</CardDescription>
+            <CardDescription>We&apos;ve sent you a verification link</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">

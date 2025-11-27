@@ -15,7 +15,10 @@ export function useClientLocale(): Locale {
       ?.split('=')[1]
 
     if (cookieValue && ['en', 'fr'].includes(cookieValue)) {
-      setLocale(cookieValue as Locale)
+      // Use requestAnimationFrame to avoid setState in effect
+      requestAnimationFrame(() => {
+        setLocale(cookieValue as Locale)
+      })
     }
   }, [])
 

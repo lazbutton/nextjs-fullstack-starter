@@ -34,7 +34,7 @@ class Logger {
     return LOG_LEVELS[level] >= LOG_LEVELS[this.config.level]
   }
 
-  private formatMessage(level: LogLevel, message: string, ...args: unknown[]): string {
+  private formatMessage(level: LogLevel, message: string): string {
     const timestamp = new Date().toISOString()
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`
     return `${prefix} ${message}`

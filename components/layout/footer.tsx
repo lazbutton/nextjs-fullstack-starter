@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 /**
  * Site footer component
  */
@@ -21,12 +23,12 @@ export function Footer() {
           >
             GitHub
           </a>
-          <a
+          <Link
             href="/docs"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Documentation
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

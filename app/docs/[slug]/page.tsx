@@ -108,7 +108,7 @@ export default async function DocumentationPage({
       /git clone <your-repo-url>/g,
       'git clone https://github.com/lazbutton/nextjs-fullstack-starter'
     )
-  } catch (error) {
+  } catch {
     docContent = `# ${activeDocConfig.title}\n\nUnable to load documentation file: ${activeDocConfig.path}`
   }
 

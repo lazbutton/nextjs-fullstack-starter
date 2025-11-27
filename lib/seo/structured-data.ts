@@ -120,6 +120,7 @@ export function generateFAQStructuredData(
 /**
  * Helper to convert structured data to script tag content
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function structuredDataToScriptTag(data: WithContext<any>): string {
   return JSON.stringify(data)
 }

@@ -5,8 +5,13 @@
 
 import { WithContext } from 'schema-dts'
 
+// Using any here is necessary for schema-dts type compatibility
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type StructuredDataValue = WithContext<any> | WithContext<any>[]
+
 interface StructuredDataProps {
-  data: WithContext<any> | WithContext<any>[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: StructuredDataValue
 }
 
 /**
@@ -84,6 +89,7 @@ export function StructuredData({ data }: StructuredDataProps) {
  * ```
  */
 export function useStructuredData(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   generateData: () => WithContext<any> | WithContext<any>[]
 ) {
   const data = generateData()
