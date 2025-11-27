@@ -1,257 +1,139 @@
-# Authentication Implementation
+# Authentification
 
-This document describes the complete authentication system implemented in this project.
+## Fonctionnalités
 
-## Features
-
-- ✅ User registration (sign up)
-- ✅ User login (sign in)
-- ✅ User logout (sign out)
-- ✅ Email verification
-- ✅ Password reset (forgot password)
-- ✅ Welcome emails
-- ✅ Password reset emails
-- ✅ Protected routes
-- ✅ Session management
+- Inscription / Connexion / Déconnexion
+- Vérification email
+- Réinitialisation mot de passe
+- Protection routes
+- Emails (Supabase pour auth + Resend pour bienvenue)
 
 ## Architecture
 
 ### Server Actions (`app/actions/auth.ts`)
 
-All authentication logic is handled via Server Actions:
-
-- `signUp()` - Create a new user account
-- `signIn()` - Authenticate existing user
-- `signOut()` - End user session
-- `resetPassword()` - Send password reset email
-- `updatePassword()` - Update user password
-- `getCurrentUser()` - Get current authenticated user
-
-### Email System (Hybrid Approach)
-
-The project uses a hybrid email approach:
-
-**Supabase** handles automatically:
-- Email verification - Sent automatically during sign up
-- Password reset email - Sent automatically when requested
-
-**Resend** handles:
-- Welcome email - Personalized welcome email sent after registration
-
-This approach provides the best of both worlds: robust auth emails via Supabase and personalized branding via Resend. See `/docs/HYBRID_EMAIL_APPROACH.md` for details.
+```typescript
+signUp()          // Inscription
+signIn()          // Connexion
+signOut()         // Déconnexion
+resetPassword()   // Demande reset MDP
+updatePassword()  // Mise à jour MDP
+getCurrentUser()  // Utilisateur actuel
+```
 
 ### Pages
 
-- `/auth/sign-in` - Login page
-- `/auth/sign-up` - Registration page
-- `/auth/forgot-password` - Password reset request
-- `/auth/reset-password` - New password form
-- `/auth/callback` - OAuth/Email verification callback
+- `/auth/sign-in` - Connexion
+- `/auth/sign-up` - Inscription
+- `/auth/forgot-password` - Demande reset
+- `/auth/reset-password` - Nouveau MDP
+- `/auth/callback` - Callback OAuth/Email
 
-### Components
+### Composants
 
-- `components/auth/sign-in-form.tsx` - Login form
-- `components/auth/sign-up-form.tsx` - Registration form
-- `components/auth/forgot-password-form.tsx` - Password reset form
-- `components/auth/reset-password-form.tsx` - New password form
-- `components/auth/user-button.tsx` - User menu with sign out
-
-### Hooks
-
-- `hooks/use-auth.ts` - Client-side authentication hook
-
-## Database Setup
-
-Supabase automatically creates the `auth.users` table when you enable authentication. However, you need to apply database migrations to create additional tables for user profiles.
-
-### Applying Database Migrations
-
-**IMPORTANT**: Before using the application, you must apply the database migrations located in `/supabase/migrations/`.
-
-1. Go to your Supabase Dashboard → SQL Editor
-2. Open each migration file in order (001, 002, etc.)
-3. Copy and paste the SQL content
-4. Click "Run" to execute the migration
-
-See `/supabase/README.md` for detailed instructions on applying migrations.
-
-### Database Tables
-
-After applying migrations, the following tables will be available:
-
-#### `auth.users` (Automatic)
-- `id` (UUID) - User ID
-- `email` (text) - User email
-- `email_confirmed_at` (timestamp) - Email verification timestamp
-- `created_at` (timestamp) - Account creation timestamp
-- `updated_at` (timestamp) - Last update timestamp
-
-#### `public.profiles` (Created by migration)
-- `id` (UUID) - References `auth.users(id)`
-- `email` (TEXT) - User email
-- `full_name` (TEXT) - User full name
-- `avatar_url` (TEXT) - User avatar URL
-- `created_at` (TIMESTAMP) - Profile creation timestamp
-- `updated_at` (TIMESTAMP) - Last update timestamp
-
-**Note**: A profile is automatically created when a new user signs up (via database trigger).
-
-#### `public.user_settings` (Created by migration)
-- `id` (UUID) - Settings ID
-- `user_id` (UUID) - References `public.profiles(id)`
-- `locale` (TEXT) - User locale preference
-- `theme` (TEXT) - User theme preference
-- `notifications_enabled` (BOOLEAN) - Enable/disable notifications
-- `email_notifications_enabled` (BOOLEAN) - Enable/disable email notifications
-- `created_at` (TIMESTAMP) - Settings creation timestamp
-- `updated_at` (TIMESTAMP) - Last update timestamp
-
-## Email Configuration
-
-### Resend Setup
-
-1. Create an account on [Resend](https://resend.com)
-2. Verify your domain (required for production)
-3. Get your API key
-4. Add to `.env.local`:
-   ```env
-   RESEND_API_KEY=your_api_key
-   RESEND_FROM_EMAIL=noreply@yourdomain.com
-   ```
-
-### Supabase Email Templates
-
-Supabase can also send emails directly. To configure:
-1. Go to Supabase Dashboard > Authentication > Email Templates
-2. Customize templates as needed
-3. Configure SMTP settings if using custom email provider
-
-## Route Protection
-
-### Protect Routes (Require Authentication)
-
-```typescript
-import { requireAuth } from '@/lib/auth/utils'
-
-export default async function ProtectedPage() {
-  const user = await requireAuth() // Redirects to /auth/sign-in if not authenticated
-  
-  return <div>Protected content for {user.email}</div>
-}
+```
+components/auth/
+  sign-in-form.tsx
+  sign-up-form.tsx
+  forgot-password-form.tsx
+  reset-password-form.tsx
+  user-button.tsx
 ```
 
-### Redirect If Authenticated
+### Hook
 
 ```typescript
-import { requireNoAuth } from '@/lib/auth/utils'
-
-export default async function PublicPage() {
-  await requireNoAuth() // Redirects to / if already authenticated
-  
-  return <div>Public content</div>
-}
-```
-
-## Client-Side Authentication
-
-Use the `useAuth` hook in client components:
-
-```typescript
-'use client'
-
 import { useAuth } from '@/hooks/use-auth'
 
-export function MyComponent() {
-  const { user, loading } = useAuth()
-  
-  if (loading) return <div>Loading...</div>
-  if (!user) return <div>Not authenticated</div>
-  
-  return <div>Welcome, {user.email}!</div>
-}
+const { user, loading } = useAuth()
 ```
 
-## Environment Variables
+## Configuration
 
-Required environment variables:
+### 1. Variables d'environnement
 
 ```env
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 
-# Resend
-RESEND_API_KEY=your_resend_api_key
+# Resend (email bienvenue)
+RESEND_API_KEY=your_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Authentication Settings
-ENABLE_EMAIL_VERIFICATION=true
+# Email verification (optionnel)
+ENABLE_EMAIL_VERIFICATION=true  # false pour désactiver
 ```
 
-### Email Verification Control
+### 2. Supabase Dashboard
 
-The `ENABLE_EMAIL_VERIFICATION` variable controls whether verification emails are sent after user registration:
+**Authentication** → **Providers** → **Email** :
+- ✅ Activer Email provider
+- ✅ Configure email confirmations (si vérification souhaitée)
 
-- **`true` or `1`**: Email verification enabled (default, secure)
-- **`false` or `0`**: Email verification disabled
-- **Not set**: Defaults to `true` (secure by default)
+**Authentication** → **URL Configuration** :
+- Ajouter : `http://localhost:3000/auth/callback` (dev)
+- Ajouter : `https://yourdomain.com/auth/callback` (prod)
 
-**Important**: When `ENABLE_EMAIL_VERIFICATION` is set to `false`, you must also configure Supabase to auto-confirm email addresses:
+### 3. Migrations
 
-1. Go to your Supabase Dashboard
-2. Navigate to **Authentication** > **Providers** > **Email**
-3. Enable **"Confirm email"** setting
-4. **IMPORTANT**: Also enable **"Auto Confirm"** to allow users to sign in immediately without email verification
+Appliquer les migrations (voir `docs/DATABASE.md`) :
+- `001_create_profiles_table.sql`
+- `002_create_user_settings_table.sql`
 
-When email verification is disabled:
-- Users can sign in immediately after registration (no email verification required)
-- No verification email is sent via Resend
-- Users are automatically redirected to the home page after signup
-- This is useful for development or when you want to skip email verification
+## Protection de Routes
 
-**Note**: If `ENABLE_EMAIL_VERIFICATION=false` but Supabase is not configured for auto-confirm, users will not receive a session and will see an error message. Make sure both settings are aligned.
+### Server Components
 
-## Supabase Configuration
+```typescript
+import { requireAuth } from '@/lib/auth/utils'
 
-### Enable Email Authentication
+export default async function ProtectedPage() {
+  const user = await requireAuth() // Redirige si non auth
+  return <div>Protected: {user.email}</div>
+}
+```
 
-1. Go to Supabase Dashboard
-2. Click on **"Authentication"** in the left sidebar
-3. Click on **"Providers"** (or **"Auth Providers"**)
-4. Find **"Email"** in the list and click on it
-5. Enable the Email provider
-6. Configure email settings:
-   - **Confirm email**: Enable if you want email verification
-   - **Auto Confirm**: Enable to automatically confirm users without email verification
-   - **Secure email change**: Enable for security
+### Redirection si authentifié
 
-**Note**: The exact location may vary depending on your Supabase dashboard version. If you can't find these settings, try:
-- Authentication > Settings (or Configuration)
-- Authentication > Auth Providers > Email
+```typescript
+import { requireNoAuth } from '@/lib/auth/utils'
 
-### Redirect URLs
+export default async function PublicPage() {
+  await requireNoAuth() // Redirige si déjà auth
+  return <div>Public content</div>
+}
+```
 
-Add these redirect URLs in Supabase Dashboard > Authentication > URL Configuration:
+## Emails
 
-- `http://localhost:3000/auth/callback` (development)
-- `https://yourdomain.com/auth/callback` (production)
+### Approche Hybride
 
-## Security Notes
+**Supabase** (automatique) :
+- Email vérification
+- Email reset mot de passe
 
-- Passwords are hashed by Supabase (never stored in plain text)
-- Sessions are managed via HTTP-only cookies
-- CSRF protection is handled by Next.js
-- Email verification helps prevent fake accounts
-- Password reset links expire after 1 hour (configurable)
+**Resend** (manuel) :
+- Email de bienvenue uniquement
 
-## Next Steps
+Voir `docs/EMAIL_GUIDE.md` pour détails.
 
-1. Configure Supabase authentication settings
-2. Set up Resend domain verification
-3. Customize email templates
-4. Add additional user profile fields if needed
-5. Implement role-based access control (RBAC) if needed
+### Désactiver vérification email
 
+1. `.env.local` : `ENABLE_EMAIL_VERIFICATION=false`
+2. **Supabase Dashboard** → **Authentication** → **Providers** → **Email** :
+   - Activer "Auto Confirm"
+
+## Sécurité
+
+- Mots de passe hashés par Supabase
+- Sessions via cookies HTTP-only
+- Protection CSRF (Next.js)
+- RLS sur tables base de données
+
+## Ressources
+
+- [Supabase Auth](https://supabase.com/docs/guides/auth)
