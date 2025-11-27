@@ -9,6 +9,11 @@
 - **Comments** : Tous les commentaires en anglais
 - **TypeScript** : Mode strict activé
 - **Build** : Vérifier avec `npm run build` régulièrement
+- **Push automatique** : Quand l'utilisateur demande de "push", automatiquement :
+  1. Créer une nouvelle branche avec un nom approprié (format : `type/description`, ex: `fix/eslint-errors`, `feat/new-feature`)
+  2. Pousser la branche sur GitHub
+  3. Créer une Pull Request vers `main` si possible (via `gh pr create` ou lien GitHub)
+  4. Ne jamais pusher directement sur `main` (branche protégée)
 
 ## Base de Données
 
