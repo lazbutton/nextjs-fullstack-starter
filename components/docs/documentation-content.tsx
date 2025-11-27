@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card'
  */
 export function DocumentationContent({ content }: { content: string }) {
   return (
-    <Card className="p-8 md:p-12">
+    <Card className="border-0 shadow-none p-8 md:p-12">
       <article className="markdown-content max-w-none">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}

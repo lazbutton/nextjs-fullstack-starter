@@ -1,48 +1,48 @@
-# Performance Base de Données
+# Database Performance
 
-## Index
+## Indexes
 
 ### Profiles
 
 ```sql
-profiles_email_idx              (email) UNIQUE        - Lookups email < 1ms
-profiles_created_at_idx         (created_at DESC)     - Tri chronologique
-profiles_full_name_idx          (full_name)           - Recherche texte
+profiles_email_idx              (email) UNIQUE        - Email lookups < 1ms
+profiles_created_at_idx         (created_at DESC)     - Chronological sorting
+profiles_full_name_idx          (full_name)           - Text search
 profiles_id_created_at_idx      (id, created_at DESC) - Pagination
 ```
 
 ### User Settings
 
 ```sql
-user_settings_user_id_idx       (user_id) UNIQUE      - Lookup user < 1ms
-user_settings_locale_idx        (locale)              - Filtrage locale
-user_settings_theme_idx         (theme)               - Filtrage thème
+user_settings_user_id_idx       (user_id) UNIQUE      - User lookup < 1ms
+user_settings_locale_idx        (locale)              - Locale filtering
+user_settings_theme_idx         (theme)               - Theme filtering
 user_settings_user_locale_idx   (user_id, locale)     - Composite
 ```
 
-## Bonnes Pratiques
+## Best Practices
 
-### ✅ À FAIRE
+### ✅ TO DO
 
 ```typescript
-// 1. Utiliser colonnes indexées
+// 1. Use indexed columns
 await supabase
   .from('profiles')
   .select('*')
-  .eq('email', 'user@example.com') // Index unique
+  .eq('email', 'user@example.com') // Unique index
 
-// 2. LIMIT pour pagination
+// 2. LIMIT for pagination
 await supabase
   .from('profiles')
   .select('*')
   .limit(20)
 
-// 3. Sélectionner colonnes nécessaires
+// 3. Select only needed columns
 await supabase
   .from('profiles')
   .select('id, email, full_name')
 
-// 4. Utiliser composite indexes
+// 4. Use composite indexes
 await supabase
   .from('profiles')
   .select('*')
@@ -50,22 +50,22 @@ await supabase
   .range(0, 9)
 ```
 
-### ❌ À ÉVITER
+### ❌ TO AVOID
 
 ```typescript
-// Colonnes non indexées
-.eq('avatar_url', 'https://...') // Scan complet
+// Non-indexed columns
+.eq('avatar_url', 'https://...') // Full table scan
 
-// SELECT * sans nécessité
-.select('*') // Quand seules quelques colonnes nécessaires
+// SELECT * unnecessarily
+.select('*') // When only a few columns needed
 
-// Pas de LIMIT
-.select('*') // Récupère TOUTES les lignes
+// No LIMIT
+.select('*') // Retrieves ALL rows
 ```
 
 ## Monitoring
 
-### Vérifier utilisation index
+### Check index usage
 
 ```sql
 SELECT indexname, idx_scan, idx_tup_read
@@ -74,60 +74,60 @@ WHERE schemaname = 'public'
 ORDER BY idx_scan DESC;
 ```
 
-### Analyser plan de requête
+### Analyze query plan
 
 ```sql
 EXPLAIN ANALYZE
 SELECT * FROM profiles WHERE email = 'user@example.com';
 
--- ✅ Chercher : Index Scan (rapide)
--- ❌ Éviter : Seq Scan (lent)
+-- ✅ Look for: Index Scan (fast)
+-- ❌ Avoid: Seq Scan (slow)
 ```
 
-### Logger requêtes lentes
+### Log slow queries
 
 ```typescript
 import { logSlowQuery } from '@/lib/database/query-optimization'
 
-logSlowQuery('profiles', 'getProfile', duration, 100) // Log si > 100ms
+logSlowQuery('profiles', 'getProfile', duration, 100) // Log if > 100ms
 ```
 
 ## Maintenance
 
-### Reindexation
+### Reindexing
 
 ```sql
--- Périodique si dégradation performance
+-- Periodic if performance degradation
 REINDEX INDEX CONCURRENTLY profiles_email_idx;
 REINDEX TABLE CONCURRENTLY public.profiles;
 ```
 
-### Statistiques
+### Statistics
 
 ```sql
--- Mettre à jour statistiques pour optimiseur
+-- Update statistics for optimizer
 ANALYZE public.profiles;
 ANALYZE public.user_settings;
 ```
 
-## Performance Cibles
+## Performance Targets
 
-| Opération | Temps cible |
+| Operation | Target Time |
 |-----------|-------------|
-| Lookup email/ID | < 1ms |
+| Email/ID lookup | < 1ms |
 | Pagination (100 items) | < 10ms |
-| Recherche texte | < 50ms |
-| Requêtes date | < 20ms |
+| Text search | < 50ms |
+| Date queries | < 20ms |
 
-## Règles d'Or
+## Golden Rules
 
-1. **Index = WHERE clauses** - Indexer colonnes fréquemment requêtées
-2. **LIMIT toujours** - Éviter récupérer toutes les lignes
-3. **Sélection minimale** - Uniquement colonnes nécessaires
-4. **Composite index** - Pour requêtes multi-colonnes
-5. **Monitor régulièrement** - EXPLAIN ANALYZE + logs
+1. **Index = WHERE clauses** - Index frequently queried columns
+2. **Always use LIMIT** - Avoid retrieving all rows
+3. **Minimal selection** - Only necessary columns
+4. **Composite index** - For multi-column queries
+5. **Monitor regularly** - EXPLAIN ANALYZE + logs
 
-## Ressources
+## Resources
 
 - [PostgreSQL Indexes](https://www.postgresql.org/docs/current/indexes.html)
 - [Supabase Performance](https://supabase.com/docs/guides/database/performance)

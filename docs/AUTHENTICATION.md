@@ -1,35 +1,35 @@
-# Authentification
+# Authentication
 
-## Fonctionnalités
+## Features
 
-- Inscription / Connexion / Déconnexion
-- Vérification email
-- Réinitialisation mot de passe
-- Protection routes
-- Emails (Supabase pour auth + Resend pour bienvenue)
+- Sign Up / Sign In / Sign Out
+- Email verification
+- Password reset
+- Route protection
+- Emails (Supabase for auth + Resend for welcome)
 
 ## Architecture
 
 ### Server Actions (`app/actions/auth.ts`)
 
 ```typescript
-signUp()          // Inscription
-signIn()          // Connexion
-signOut()         // Déconnexion
-resetPassword()   // Demande reset MDP
-updatePassword()  // Mise à jour MDP
-getCurrentUser()  // Utilisateur actuel
+signUp()          // Sign up
+signIn()          // Sign in
+signOut()         // Sign out
+resetPassword()   // Request password reset
+updatePassword()  // Update password
+getCurrentUser()  // Current user
 ```
 
 ### Pages
 
-- `/auth/sign-in` - Connexion
-- `/auth/sign-up` - Inscription
-- `/auth/forgot-password` - Demande reset
-- `/auth/reset-password` - Nouveau MDP
-- `/auth/callback` - Callback OAuth/Email
+- `/auth/sign-in` - Sign in
+- `/auth/sign-up` - Sign up
+- `/auth/forgot-password` - Request password reset
+- `/auth/reset-password` - New password
+- `/auth/callback` - OAuth/Email callback
 
-### Composants
+### Components
 
 ```
 components/auth/
@@ -50,41 +50,41 @@ const { user, loading } = useAuth()
 
 ## Configuration
 
-### 1. Variables d'environnement
+### 1. Environment Variables
 
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 
-# Resend (email bienvenue)
+# Resend (welcome email)
 RESEND_API_KEY=your_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Email verification (optionnel)
-ENABLE_EMAIL_VERIFICATION=true  # false pour désactiver
+# Email verification (optional)
+ENABLE_EMAIL_VERIFICATION=true  # false to disable
 ```
 
 ### 2. Supabase Dashboard
 
 **Authentication** → **Providers** → **Email** :
-- ✅ Activer Email provider
-- ✅ Configure email confirmations (si vérification souhaitée)
+- ✅ Enable Email provider
+- ✅ Configure email confirmations (if verification desired)
 
 **Authentication** → **URL Configuration** :
-- Ajouter : `http://localhost:3000/auth/callback` (dev)
-- Ajouter : `https://yourdomain.com/auth/callback` (prod)
+- Add: `http://localhost:3000/auth/callback` (dev)
+- Add: `https://yourdomain.com/auth/callback` (prod)
 
 ### 3. Migrations
 
-Appliquer les migrations (voir `docs/DATABASE.md`) :
+Apply migrations (see `docs/DATABASE.md`) :
 - `001_create_profiles_table.sql`
 - `002_create_user_settings_table.sql`
 
-## Protection de Routes
+## Route Protection
 
 ### Server Components
 
@@ -92,48 +92,48 @@ Appliquer les migrations (voir `docs/DATABASE.md`) :
 import { requireAuth } from '@/lib/auth/utils'
 
 export default async function ProtectedPage() {
-  const user = await requireAuth() // Redirige si non auth
+  const user = await requireAuth() // Redirects if not authenticated
   return <div>Protected: {user.email}</div>
 }
 ```
 
-### Redirection si authentifié
+### Redirect if authenticated
 
 ```typescript
 import { requireNoAuth } from '@/lib/auth/utils'
 
 export default async function PublicPage() {
-  await requireNoAuth() // Redirige si déjà auth
+  await requireNoAuth() // Redirects if already authenticated
   return <div>Public content</div>
 }
 ```
 
 ## Emails
 
-### Approche Hybride
+### Hybrid Approach
 
-**Supabase** (automatique) :
-- Email vérification
-- Email reset mot de passe
+**Supabase** (automatic) :
+- Email verification
+- Password reset email
 
-**Resend** (manuel) :
-- Email de bienvenue uniquement
+**Resend** (manual) :
+- Welcome email only
 
-Voir `docs/EMAIL_GUIDE.md` pour détails.
+See `docs/EMAIL_GUIDE.md` for details.
 
-### Désactiver vérification email
+### Disable email verification
 
-1. `.env.local` : `ENABLE_EMAIL_VERIFICATION=false`
-2. **Supabase Dashboard** → **Authentication** → **Providers** → **Email** :
-   - Activer "Auto Confirm"
+1. `.env.local`: `ENABLE_EMAIL_VERIFICATION=false`
+2. **Supabase Dashboard** → **Authentication** → **Providers** → **Email**:
+   - Enable "Auto Confirm"
 
-## Sécurité
+## Security
 
-- Mots de passe hashés par Supabase
-- Sessions via cookies HTTP-only
-- Protection CSRF (Next.js)
-- RLS sur tables base de données
+- Passwords hashed by Supabase
+- Sessions via HTTP-only cookies
+- CSRF protection (Next.js)
+- RLS on database tables
 
-## Ressources
+## Resources
 
 - [Supabase Auth](https://supabase.com/docs/guides/auth)

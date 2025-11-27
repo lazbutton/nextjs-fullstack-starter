@@ -1,18 +1,18 @@
-# Configuration Base de Données
+# Database Configuration
 
-## Démarrage Rapide
+## Quick Start
 
-### 1. Appliquer les migrations
+### 1. Apply migrations
 
-**Via Supabase Dashboard** (recommandé) :
-1. Ouvrir [supabase.com](https://supabase.com) → Votre projet
+**Via Supabase Dashboard** (recommended):
+1. Open [supabase.com](https://supabase.com) → Your project
 2. **SQL Editor** → **New Query**
-3. Copier-coller le contenu de `/supabase/migrations/001_create_profiles_table.sql`
+3. Copy-paste content from `/supabase/migrations/001_create_profiles_table.sql`
 4. **Run** (Ctrl/Cmd + Enter)
-5. Répéter pour `002_create_user_settings_table.sql`
-6. Répéter pour `003_add_performance_indexes.sql`
+5. Repeat for `002_create_user_settings_table.sql`
+6. Repeat for `003_add_performance_indexes.sql`
 
-**Via Supabase CLI** :
+**Via Supabase CLI**:
 ```bash
 npm install -g supabase
 supabase login
@@ -20,24 +20,24 @@ supabase link --project-ref your-project-ref
 supabase db push
 ```
 
-### 2. Vérifier
+### 2. Verify
 
-**Table Editor** → Vérifier la présence de :
+**Table Editor** → Check presence of:
 - ✅ `profiles`
 - ✅ `user_settings`
 
-**Database** → **Triggers** → Vérifier :
+**Database** → **Triggers** → Check:
 - ✅ `on_auth_user_created`
 
-### 3. Tester
+### 3. Test
 
-1. Créer un compte utilisateur
-2. Vérifier qu'un profil est créé automatiquement dans `profiles`
+1. Create a user account
+2. Verify that a profile is automatically created in `profiles`
 
 ## Tables
 
 ### `profiles`
-Informations utilisateur liées à `auth.users`.
+User information linked to `auth.users`.
 
 ```sql
 id            UUID PRIMARY KEY → auth.users(id)
@@ -48,10 +48,10 @@ created_at    TIMESTAMP
 updated_at    TIMESTAMP
 ```
 
-**Création automatique** : Trigger lors de l'inscription.
+**Automatic creation**: Trigger on sign up.
 
 ### `user_settings`
-Préférences utilisateur.
+User preferences.
 
 ```sql
 id                           UUID PRIMARY KEY
@@ -64,59 +64,59 @@ created_at                   TIMESTAMP
 updated_at                   TIMESTAMP
 ```
 
-## Sécurité (RLS)
+## Security (RLS)
 
-Row Level Security activé sur toutes les tables :
-- Utilisateurs voient/modifient **uniquement leurs propres données**
+Row Level Security enabled on all tables:
+- Users can view/modify **only their own data**
 
-## Utilisation dans le code
+## Usage in code
 
 ```typescript
 import { getProfile, updateProfile } from '@/lib/database'
 
-// Récupérer profil
+// Get profile
 const profile = await getProfile(userId)
 
-// Mettre à jour
+// Update
 await updateProfile(userId, {
   full_name: 'John Doe',
   avatar_url: 'https://...'
 })
 ```
 
-## Dépannage
+## Troubleshooting
 
-### Migration échoue : "relation already exists"
+### Migration fails: "relation already exists"
 
-Table existe déjà. Options :
-1. Ignorer (si structure correcte)
-2. Supprimer et recréer (dev uniquement) :
+Table already exists. Options:
+1. Ignore (if structure is correct)
+2. Drop and recreate (dev only):
 ```sql
 DROP TABLE IF EXISTS public.user_settings CASCADE;
 DROP TABLE IF EXISTS public.profiles CASCADE;
--- Réexécuter migrations
+-- Re-run migrations
 ```
 
-### Profil non créé à l'inscription
+### Profile not created on signup
 
-1. Vérifier trigger existe :
+1. Verify trigger exists:
 ```sql
 SELECT * FROM pg_trigger WHERE tgname = 'on_auth_user_created';
 ```
 
-2. Consulter **Logs** dans Supabase Dashboard
+2. Check **Logs** in Supabase Dashboard
 
-### Erreurs RLS
+### RLS errors
 
 ```sql
--- Vérifier RLS activé
+-- Verify RLS enabled
 SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public';
 
--- Vérifier policies
+-- Verify policies
 SELECT * FROM pg_policies WHERE schemaname = 'public';
 ```
 
-## Ressources
+## Resources
 
 - [Supabase Migrations](https://supabase.com/docs/guides/database/migrations)
 - [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)

@@ -1,150 +1,160 @@
 # Next.js Template
 
-Template Next.js moderne avec TypeScript, Supabase, shadcn/ui et Resend.
+Modern Next.js template with TypeScript, Supabase, shadcn/ui and Resend.
 
 ## Stack
 
 - **Next.js 16** App Router + TypeScript strict
 - **Supabase** (PostgreSQL + Auth)
 - **shadcn/ui** + Tailwind CSS
-- **Resend** (emails de bienvenue)
+- **Resend** (welcome emails)
 - **i18n** (en, fr)
 
-## Fonctionnalités
+## Features
 
-### ✅ Implémenté
+### ✅ Implemented
 
-#### Authentification & Utilisateurs
-- ✅ Inscription avec email/mot de passe
-- ✅ Connexion/Déconnexion
-- ✅ Réinitialisation de mot de passe
-- ✅ Vérification d'email (configurable)
-- ✅ Gestion de session SSR avec Supabase
-- ✅ Protection de routes (middleware)
-- ✅ Création automatique de profil utilisateur
-- ✅ API pour créer profil manuel (`/api/admin/create-profile`)
+#### Authentication & Users
 
-#### Base de données
-- ✅ Migrations Supabase (profiles, user_settings)
-- ✅ Row Level Security (RLS) configuré
-- ✅ Triggers SQL pour création automatique de profils
-- ✅ Indexes de performance
-- ✅ Utilitaires pour requêtes optimisées
+- ✅ Sign up with email/password
+- ✅ Sign in/Sign out
+- ✅ Password reset
+- ✅ Email verification (configurable)
+- ✅ SSR session management with Supabase
+- ✅ Route protection (middleware)
+- ✅ Automatic user profile creation
+- ✅ API to manually create profile (`/api/admin/create-profile`)
+
+#### Database
+
+- ✅ Supabase migrations (profiles, user_settings)
+- ✅ Row Level Security (RLS) configured
+- ✅ SQL triggers for automatic profile creation
+- ✅ Performance indexes
+- ✅ Utilities for optimized queries
 
 #### UI/UX
-- ✅ Système de notifications/Toast (Sonner)
-- ✅ Gestion d'erreurs globale (error.tsx, not-found.tsx, global-error.tsx)
-- ✅ États de chargement (loading.tsx, LoadingSpinner, Skeleton)
-- ✅ Layouts (SiteLayout, DashboardLayout avec sidebar)
+
+- ✅ Notification/Toast system (Sonner)
+- ✅ Global error handling (error.tsx, not-found.tsx, global-error.tsx)
+- ✅ Loading states (loading.tsx, LoadingSpinner, Skeleton)
+- ✅ Layouts (SiteLayout, DashboardLayout with sidebar)
 - ✅ Navigation (Header, Footer, Sidebar)
-- ✅ Composants UI de base (Button, Input, Card, Label)
-- ✅ Composants de données (EmptyState, StatsCard)
-- ✅ Pagination (composant + hook)
-- ✅ Recherche (SearchInput avec debounce + hook)
+- ✅ Basic UI components (Button, Input, Card, Label)
+- ✅ Data components (EmptyState, StatsCard)
+- ✅ Pagination (component + hook)
+- ✅ Search (SearchInput with debounce + hook)
 
-#### Validation & Sécurité
-- ✅ Validation Zod (schémas réutilisables)
-- ✅ Validation serveur et client
-- ✅ Gestion centralisée des erreurs
+#### Validation & Security
 
-#### Internationalisation
-- ✅ Support multilingue (en, fr)
-- ✅ Changement de langue via cookie (pas d'URL)
-- ✅ Traductions dynamiques
+- ✅ Zod validation (reusable schemas)
+- ✅ Server and client validation
+- ✅ Centralized error handling
 
-#### Utilitaires
-- ✅ Système de logging
-- ✅ Utilitaires email (templates, envoi)
-- ✅ Utilitaires base de données
-- ✅ Hooks personnalisés (useAuth, usePagination, useSearch)
+#### Internationalization
+
+- ✅ Multi-language support (en, fr)
+- ✅ Language switching via cookie (not URL)
+- ✅ Dynamic translations
+
+#### Utilities
+
+- ✅ Logging system
+- ✅ Email utilities (templates, sending)
+- ✅ Database utilities
+- ✅ Custom hooks (useAuth, usePagination, useSearch)
 
 #### Emails
-- ✅ Templates HTML pour emails
-- ✅ Email de bienvenue (Resend)
-- ✅ Emails d'authentification (Supabase)
-- ✅ Configuration hybride (Supabase + Resend)
 
-### 🚧 À implémenter
+- ✅ HTML email templates
+- ✅ Welcome email (Resend)
+- ✅ Authentication emails (Supabase)
+- ✅ Hybrid configuration (Supabase + Resend)
 
-#### Priorité Haute
-- ⏳ Upload de fichiers vers Supabase Storage
-- ⏳ Composant DataTable avec tri et filtres
-- ⏳ Modal/Dialog système (shadcn/ui)
+### 🚧 To be implemented
 
-#### Priorité Moyenne
+#### High Priority
+
+- ⏳ File upload to Supabase Storage
+- ⏳ DataTable component with sorting and filters
+- ⏳ Modal/Dialog system (shadcn/ui)
+
+#### Medium Priority
+
 - ⏳ Tests Setup (Vitest/Jest + React Testing Library)
 - ⏳ Pre-commit hooks (Husky + lint-staged)
 - ⏳ Dark Mode (next-themes)
-- ⏳ Rate Limiting sur Server Actions
+- ⏳ Rate Limiting on Server Actions
 - ⏳ Analytics & Monitoring (Sentry, Google Analytics)
-- ⏳ Variables d'environnement typées (validation Zod)
+- ⏳ Typed environment variables (Zod validation)
 
-#### Priorité Basse
-- ⏳ Composants UI supplémentaires (Select, Dropdown, Tabs, etc.)
+#### Low Priority
+
+- ⏳ Additional UI components (Select, Dropdown, Tabs, etc.)
 - ⏳ CI/CD Configuration (GitHub Actions)
-- ⏳ Documentation API Routes
-- ⏳ Image Optimization avancée
-- ⏳ Accessibilité (audit a11y)
-- ⏳ Caching Strategy avancée
+- ⏳ API Routes documentation
+- ⏳ Advanced image optimization
+- ⏳ Accessibility (a11y audit)
+- ⏳ Advanced caching strategy
 
 ## Installation
 
 ```bash
-# 1. Cloner et installer
+# 1. Clone and install
 git clone <your-repo-url>
 npm install
 
-# 2. Configuration .env.local
+# 2. Configure .env.local
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# 3. Appliquer les migrations DB (voir docs/DATABASE.md)
-# 4. Lancer
+# 3. Apply database migrations (see docs/DATABASE.md)
+# 4. Run
 npm run dev
 ```
 
 ## Structure
 
 ```
-app/            # Pages et layouts
+app/            # Pages and layouts
   actions/      # Server actions
-components/     # Composants React
+components/     # React components
   ui/          # shadcn/ui
-lib/           # Utils et config
-  supabase/   # Clients Supabase
-  database/   # Utils DB
-  auth/       # Utils auth
-types/         # Types TypeScript
-i18n/          # Traductions
+lib/           # Utils and config
+  supabase/   # Supabase clients
+  database/   # DB utils
+  auth/       # Auth utils
+types/         # TypeScript definitions
+i18n/          # Translations
 docs/          # Documentation
-supabase/      # Migrations SQL
+supabase/      # SQL migrations
 ```
 
 ## Documentation
 
-- **[DATABASE.md](docs/DATABASE.md)** - Configuration base de données
-- **[AUTHENTICATION.md](docs/AUTHENTICATION.md)** - Système d'authentification
-- **[DATABASE_PERFORMANCE.md](docs/DATABASE_PERFORMANCE.md)** - Optimisation performance
-- **[EMAIL_GUIDE.md](docs/EMAIL_GUIDE.md)** - Guide emails (Supabase + Resend)
-- **[PROJECT_PREFERENCES.md](PROJECT_PREFERENCES.md)** - Conventions du projet
+- **[DATABASE.md](docs/DATABASE.md)** - Database configuration
+- **[AUTHENTICATION.md](docs/AUTHENTICATION.md)** - Authentication system
+- **[DATABASE_PERFORMANCE.md](docs/DATABASE_PERFORMANCE.md)** - Performance optimization
+- **[EMAIL_GUIDE.md](docs/EMAIL_GUIDE.md)** - Email guide (Supabase + Resend)
+- **[PROJECT_PREFERENCES.md](PROJECT_PREFERENCES.md)** - Project conventions
 
-## Commandes
+## Commands
 
 ```bash
-npm run dev      # Développement
-npm run build    # Build production
+npm run dev      # Development
+npm run build    # Production build
 npm run lint     # Linter
 ```
 
-## Ajout de composants shadcn/ui
+## Adding shadcn/ui components
 
 ```bash
 npx shadcn@latest add [component-name]
 ```
 
-## Licence
+## License
 
 MIT

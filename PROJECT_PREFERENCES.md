@@ -69,6 +69,12 @@ Si absolument nécessaire :
 - **Clés** : Modifier uniquement `en.json`
 - **Autres langues** : Mises à jour manuelles
 
+## Documentation
+
+- **Fichiers de documentation** : Tous les fichiers de documentation (`.md`) doivent être rédigés en anglais
+- **Fichiers concernés** : `README.md`, tous les fichiers dans `/docs/`, `ENV.md`, etc.
+- **Commentaires dans le code** : Toujours en anglais (voir section "Traductions")
+
 ## Stack & Technos
 
 - Next.js 16 (App Router)

@@ -1,142 +1,142 @@
-# Guide Emails : Supabase + Resend
+# Email Guide: Supabase + Resend
 
-## Approche Hybride
+## Hybrid Approach
 
-| Email | Service | Raison |
+| Email | Service | Reason |
 |-------|---------|--------|
-| Vérification email | Supabase | Automatique, inclus |
-| Reset mot de passe | Supabase | Automatique, inclus |
-| Email de bienvenue | Resend | Personnalisé, branding |
+| Email verification | Supabase | Automatic, included |
+| Password reset | Supabase | Automatic, included |
+| Welcome email | Resend | Custom, branding |
 
 ## Configuration
 
-### Supabase (emails auth)
+### Supabase (auth emails)
 
-**Dashboard** → **Authentication** → **Email Templates** :
-- Personnaliser templates HTML si besoin
-- Variables : `{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ .Token }}`
+**Dashboard** → **Authentication** → **Email Templates**:
+- Customize HTML templates if needed
+- Variables: `{{ .ConfirmationURL }}`, `{{ .Email }}`, `{{ .Token }}`
 
-### Resend (email bienvenue)
+### Resend (welcome email)
 
 ```env
 RESEND_API_KEY=your_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 ```
 
-1. Compte [Resend](https://resend.com)
-2. Vérifier domaine (prod)
-3. Récupérer API key
+1. [Resend](https://resend.com) account
+2. Verify domain (prod)
+3. Get API key
 
-## Utilisation
+## Usage
 
-### Inscription
+### Sign Up
 
 ```typescript
-// Supabase envoie automatiquement email vérification
+// Supabase automatically sends verification email
 await supabase.auth.signUp({
   email,
   password,
   options: { emailRedirectTo: callbackUrl }
 })
 
-// Resend envoie email bienvenue
+// Resend sends welcome email
 await sendWelcomeEmail(email)
 ```
 
-### Reset mot de passe
+### Password Reset
 
 ```typescript
-// Supabase envoie automatiquement email reset
+// Supabase automatically sends reset email
 await supabase.auth.resetPasswordForEmail(email, {
   redirectTo: resetUrl
 })
 
-// Pas besoin d'email supplémentaire
+// No additional email needed
 ```
 
 ## Options
 
-### Option 1 : Uniquement Supabase
+### Option 1: Supabase Only
 
-**Supprimer Resend** :
+**Remove Resend**:
 1. `npm uninstall resend`
-2. Supprimer variables env Resend
-3. Supprimer appels `sendWelcomeEmail()`
+2. Remove Resend env variables
+3. Remove `sendWelcomeEmail()` calls
 
-**Avantages** : Simple, gratuit, un seul service
-**Inconvénients** : Pas d'email bienvenue, design basique
+**Advantages**: Simple, free, single service
+**Disadvantages**: No welcome email, basic design
 
-### Option 2 : Uniquement Resend
+### Option 2: Resend Only
 
-**Désactiver emails Supabase** :
+**Disable Supabase emails**:
 1. Dashboard → **Authentication** → **Settings**
-2. Désactiver envoi automatique
-3. Gérer tokens manuellement
+2. Disable automatic sending
+3. Manage tokens manually
 
-**Avantages** : Contrôle total, design custom
-**Inconvénients** : Plus de code, coûts, maintenance
+**Advantages**: Full control, custom design
+**Disadvantages**: More code, costs, maintenance
 
-### Option 3 : Hybride (recommandé)
+### Option 3: Hybrid (recommended)
 
-**Utiliser les deux** :
-- Supabase pour auth (vérification, reset)
-- Resend pour bienvenue
+**Use both**:
+- Supabase for auth (verification, reset)
+- Resend for welcome
 
-**Avantages** : Meilleur des deux mondes
-**Inconvénients** : Deux services
+**Advantages**: Best of both worlds
+**Disadvantages**: Two services
 
-## Désactiver Vérification Email
+## Disable Email Verification
 
 ### 1. Application
 
-`.env.local` :
+`.env.local`:
 ```env
 ENABLE_EMAIL_VERIFICATION=false
 ```
 
 ### 2. Supabase Dashboard
 
-**Authentication** → **Providers** → **Email** :
-- ✅ Activer "Confirm email"
-- ✅ Activer "Auto Confirm"
+**Authentication** → **Providers** → **Email**:
+- ✅ Enable "Confirm email"
+- ✅ Enable "Auto Confirm"
 
-**Résultat** : Connexion immédiate sans vérification email.
+**Result**: Immediate sign in without email verification.
 
-## Coûts
+## Costs
 
-- **Supabase** : Emails auth inclus (gratuit)
-- **Resend** : 
-  - 100 emails/jour gratuits
-  - Uniquement bienvenue (1 par inscription)
+- **Supabase**: Auth emails included (free)
+- **Resend**: 
+  - 100 free emails/day
+  - Welcome email only (1 per signup)
 
-## Dépannage
+## Troubleshooting
 
-### Double emails de vérification
+### Double verification emails
 
-**Cause** : Supabase + Resend envoient tous deux
-**Solution** : Utiliser approche hybride (voir Option 3)
+**Cause**: Both Supabase + Resend sending
+**Solution**: Use hybrid approach (see Option 3)
 
-### Utilisateur ne peut pas se connecter après inscription
+### User cannot sign in after signup
 
-1. Vérifier `ENABLE_EMAIL_VERIFICATION` dans `.env.local`
-2. Vérifier "Auto Confirm" activé dans Supabase
-3. Redémarrer serveur dev
+1. Check `ENABLE_EMAIL_VERIFICATION` in `.env.local`
+2. Check "Auto Confirm" enabled in Supabase
+3. Restart dev server
 
-### Email de bienvenue non envoyé
+### Welcome email not sent
 
-1. Vérifier `RESEND_API_KEY` configuré
-2. Vérifier domaine vérifié (prod)
-3. Consulter logs application
+1. Check `RESEND_API_KEY` configured
+2. Check domain verified (prod)
+3. Check application logs
 
-## Recommandations
+## Recommendations
 
-| Cas d'usage | Recommandation |
-|-------------|----------------|
-| MVP / Projet simple | Uniquement Supabase |
-| Projet avec branding | Hybride (Supabase + Resend) |
-| Emails transactionnels complexes | Uniquement Resend |
+| Use Case | Recommendation |
+|----------|----------------|
+| MVP / Simple project | Supabase only |
+| Project with branding | Hybrid (Supabase + Resend) |
+| Complex transactional emails | Resend only |
 
-## Ressources
+## Resources
 
 - [Supabase Auth Email](https://supabase.com/docs/guides/auth/auth-email)
 - [Resend Docs](https://resend.com/docs)
