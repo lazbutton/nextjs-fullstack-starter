@@ -24,9 +24,13 @@ export function CodeBlockWithCopy({
         : preRef.current.textContent || ''
       
       // Use requestAnimationFrame to avoid setState in effect
-      requestAnimationFrame(() => {
+      const rafId = requestAnimationFrame(() => {
         setCodeText(textContent)
       })
+
+      return () => {
+        cancelAnimationFrame(rafId)
+      }
     }
   }, [children])
 

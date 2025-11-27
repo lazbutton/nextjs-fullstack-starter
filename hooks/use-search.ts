@@ -31,7 +31,7 @@ export function useSearch({
 
   useEffect(() => {
     // Use requestAnimationFrame to avoid setState in effect
-    requestAnimationFrame(() => {
+    const rafId = requestAnimationFrame(() => {
       setIsSearching(true)
     })
 
@@ -45,6 +45,7 @@ export function useSearch({
     }, debounceMs)
 
     return () => {
+      cancelAnimationFrame(rafId)
       clearTimeout(timer)
       setIsSearching(false)
     }
