@@ -41,8 +41,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# markdown files (generated, except README.md and PROJECT_PREFERENCES.md)
+# markdown files (generated, except README.md, PROJECT_PREFERENCES.md, and docs)
 *.md
 !/README.md
 !**/README.md
 !/PROJECT_PREFERENCES.md
+!/QUICK_START_DATABASE.md
+!**/docs/*.md
+!**/supabase/*.md
