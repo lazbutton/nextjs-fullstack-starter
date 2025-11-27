@@ -1,13 +1,14 @@
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { DashboardHeader } from '@/components/dashboard/header'
+import { requireAdmin } from '@/lib/auth/utils'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Dashboard',
-    template: '%s | Dashboard',
+    default: 'Admin Panel',
+    template: '%s | Admin Panel',
   },
-  description: 'Manage your application from your personal dashboard.',
+  description: 'Administrative panel for managing the application.',
   robots: {
     index: false,
     follow: false,
@@ -15,14 +16,18 @@ export const metadata: Metadata = {
 }
 
 /**
- * Dashboard layout
- * Provides a sidebar navigation and header for dashboard pages
+ * Admin layout
+ * Protected layout that requires admin role
+ * Provides a sidebar navigation and header for admin pages
  */
-export default function DashboardLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // Require admin role - redirects to home if not admin
+  await requireAdmin()
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />

@@ -6,15 +6,15 @@ import { cn } from '@/lib/utils'
 import { Home, Settings, Users, BarChart3, FileText } from 'lucide-react'
 
 /**
- * Dashboard sidebar navigation
- * Provides navigation links for dashboard pages
+ * Admin sidebar navigation
+ * Provides navigation links for admin pages
  */
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Users', href: '/dashboard/users', icon: Users },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-  { name: 'Reports', href: '/dashboard/reports', icon: FileText },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Admin Panel', href: '/admin', icon: Home },
+  { name: 'Users', href: '/admin/users', icon: Users },
+  { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+  { name: 'Reports', href: '/admin/reports', icon: FileText },
+  { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
 export function Sidebar() {
@@ -24,8 +24,8 @@ export function Sidebar() {
     <aside className="w-64 border-r bg-background">
       <div className="flex h-full flex-col">
         <div className="flex h-16 items-center border-b px-6">
-          <Link href="/dashboard" className="flex items-center space-x-2">
-            <span className="text-lg font-bold">Dashboard</span>
+          <Link href="/admin" className="flex items-center space-x-2">
+            <span className="text-lg font-bold">Admin Panel</span>
           </Link>
         </div>
         <nav className="flex-1 space-y-1 p-4">

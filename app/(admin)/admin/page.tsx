@@ -1,14 +1,24 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Admin Panel',
+  description: 'Administrative panel for managing the application.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 /**
- * Dashboard home page
- * Displays overview and quick actions
+ * Admin panel home page
+ * Displays overview and quick actions for administrators
  */
-export default function DashboardPage() {
+export default function AdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold">Welcome to your Dashboard</h2>
+        <h1 className="text-3xl font-bold">Admin Panel</h1>
         <p className="text-muted-foreground">
           Manage your application from here
         </p>

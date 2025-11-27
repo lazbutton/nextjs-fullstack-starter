@@ -43,6 +43,19 @@ ENABLE_EMAIL_VERIFICATION=true
   - Set to `false` or `0` to disable email verification
   - If not set, defaults to `true` (secure by default)
 
+### Admin Scripts (Optional)
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+- **SUPABASE_SERVICE_ROLE_KEY**: Service role key for admin scripts (e.g., creating test admin user, promoting users to admin)
+  - Get this from: Supabase Dashboard → Settings → API → service_role key
+  - **⚠️ Never expose this key to the client** - Only use in server-side scripts
+  - Required for:
+    - `scripts/create-test-admin.ts` - Creates test admin account (doejohn@email.com)
+    - `scripts/promote-to-admin.ts` - Promotes existing users to admin role
+
 ## Setup Instructions
 
 1. Copy this template to create your `.env.local` file:

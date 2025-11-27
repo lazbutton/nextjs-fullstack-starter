@@ -3,11 +3,14 @@
  * These types represent the structure of your Supabase database tables
  */
 
+import type { UserRole } from '@/lib/auth/roles'
+
 export interface Profile {
   id: string
   email: string | null
   full_name: string | null
   avatar_url: string | null
+  role: UserRole
   created_at: string
   updated_at: string
 }
@@ -28,12 +31,14 @@ export interface ProfileInsert {
   email?: string | null
   full_name?: string | null
   avatar_url?: string | null
+  role?: UserRole
 }
 
 export interface ProfileUpdate {
   email?: string | null
   full_name?: string | null
   avatar_url?: string | null
+  role?: UserRole
 }
 
 export interface UserSettingsInsert {
@@ -67,4 +72,3 @@ export interface SortParams {
   orderBy: string
   orderDirection: 'asc' | 'desc'
 }
-

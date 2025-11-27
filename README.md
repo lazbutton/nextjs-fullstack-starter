@@ -123,15 +123,35 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Required for admin scripts (create test user, promote users)
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 # Optional: SEO verification codes
 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your_code
 NEXT_PUBLIC_YANDEX_VERIFICATION=your_code
 NEXT_PUBLIC_BING_VERIFICATION=your_code
 
 # 3. Apply database migrations (see docs/DATABASE.md)
-# 4. Run
+# 4. Create test admin user (optional, for testing)
+npx tsx scripts/create-test-admin.ts
+# 5. Run
 npm run dev
 ```
+
+## Test Admin Account
+
+For testing purposes, you can use the test admin account:
+
+- **Email**: `doejohn@email.com`
+- **Password**: `test`
+- **Role**: Admin
+
+This account has full admin privileges and can access `/admin`. To create or update this account, run:
+
+```bash
+npx tsx scripts/create-test-admin.ts
+```
+
+**Note**: This requires `SUPABASE_SERVICE_ROLE_KEY` in your `.env.local` file.
 
 ## Structure
 
@@ -162,9 +182,11 @@ supabase/      # SQL migrations
 ## Commands
 
 ```bash
-npm run dev      # Development
-npm run build    # Production build
-npm run lint     # Linter
+npm run dev                    # Development
+npm run build                  # Production build
+npm run lint                   # Linter
+npx tsx scripts/create-test-admin.ts    # Create/update test admin user
+npx tsx scripts/promote-to-admin.ts <email>  # Promote user to admin
 ```
 
 ## Adding shadcn/ui components

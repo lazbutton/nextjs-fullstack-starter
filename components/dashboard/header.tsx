@@ -3,7 +3,7 @@ import { LocaleSwitcher } from '@/components/locale-switcher'
 import { getLocale } from '@/lib/i18n/cookies'
 
 /**
- * Dashboard header
+ * Admin header
  * Displays user actions and locale switcher
  */
 export async function DashboardHeader() {
@@ -12,7 +12,7 @@ export async function DashboardHeader() {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">
       <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold">Dashboard</h1>
+        <h1 className="text-lg font-semibold">Admin Panel</h1>
       </div>
       <div className="flex items-center gap-4">
         <LocaleSwitcher currentLocale={locale} />

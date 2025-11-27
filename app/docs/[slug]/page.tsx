@@ -10,6 +10,8 @@ import { DocumentationContent } from '@/components/docs/documentation-content'
 import { scanDocumentationFiles } from '@/lib/docs/scan'
 import { StructuredData } from '@/components/seo/structured-data'
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '@/lib/seo/structured-data'
+import { getCurrentUserRole } from '@/lib/auth/utils'
+import { isAdmin } from '@/lib/auth/roles'
 
 /**
  * Generate dynamic metadata for each documentation page
@@ -127,13 +129,21 @@ export default async function DocumentationPage({
     { name: activeDocConfig.title, url: `${baseUrl}/docs/${slug}` },
   ])
 
+  // Check if user is admin for proper spacing
+  const userRole = await getCurrentUserRole()
+  const userIsAdmin = isAdmin(userRole)
+  // Header top position: 40px (admin banner) + 56px (header) = 96px when admin, 56px when not
+  const headerTop = userIsAdmin ? 'top-24' : 'top-14'
+  // Content padding top: 73px (96px - 56px/2) when admin, 57px when not
+  const contentPaddingTop = userIsAdmin ? 'pt-[73px]' : 'pt-[57px]'
+
   return (
     <SiteLayout>
       <StructuredData data={[articleStructuredData, breadcrumbStructuredData]} />
       <div className="flex h-[calc(100vh-3.5rem)]">
-        <DocsSidebar docs={docs} />
+        <DocsSidebar docs={docs} isAdmin={userIsAdmin} />
         <div className="ml-64 flex flex-1 flex-col overflow-hidden">
-          <div className="fixed top-14 left-64 right-0 z-40 border-b bg-background">
+          <div className={`fixed ${headerTop} left-64 right-0 z-40 border-b bg-background`}>
             <div className="container mx-auto flex items-center justify-between px-6 py-2">
               <div>
                 <h1 className="text-xl font-bold">{activeDocConfig.title}</h1>
@@ -152,7 +162,7 @@ export default async function DocumentationPage({
               </Link>
             </div>
           </div>
-          <main className="flex-1 overflow-y-auto pt-[57px]">
+          <main className={`flex-1 overflow-y-auto ${contentPaddingTop}`}>
             <div className="container mx-auto max-w-4xl px-6 py-8">
               <DocumentationContent content={docContent} />
             </div>

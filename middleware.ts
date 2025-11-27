@@ -1,5 +1,5 @@
 /**
- * Middleware for Supabase session management
+ * Middleware for Supabase session management and route protection
  * 
  * Note: Next.js 16 deprecates the middleware file convention in favor of "proxy".
  * However, this middleware is required for Supabase SSR session handling.
@@ -10,10 +10,65 @@
  */
 
 import { updateSession } from '@/lib/supabase/middleware'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { isAdmin } from '@/lib/auth/roles'
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  // First, update session for Supabase SSR
+  let response = await updateSession(request)
+
+  // Protect /admin routes - require admin role
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    try {
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return request.cookies.getAll()
+            },
+            setAll(cookiesToSet) {
+              cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+              response = NextResponse.next({ request })
+              cookiesToSet.forEach(({ name, value, options }) =>
+                response.cookies.set(name, value, options)
+              )
+            },
+          },
+        }
+      )
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        // Not authenticated - redirect to sign in
+        const signInUrl = new URL('/auth/sign-in', request.url)
+        signInUrl.searchParams.set('redirect', request.nextUrl.pathname)
+        return NextResponse.redirect(signInUrl)
+      }
+
+      // Check if user has admin role by querying profile directly
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (!profile || !isAdmin(profile.role)) {
+        // Not admin - redirect to home
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+    } catch (error) {
+      // On error, redirect to home for security
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
+
+  return response
 }
 
 export const config = {

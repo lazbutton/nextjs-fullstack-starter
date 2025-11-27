@@ -1,7 +1,7 @@
 # robots.txt
 User-agent: *
 Allow: /
-Disallow: /dashboard/
+Disallow: /admin/
 Disallow: /api/
 Disallow: /auth/
 

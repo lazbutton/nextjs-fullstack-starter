@@ -10,12 +10,20 @@ import type { DocFile } from '@/lib/docs/scan'
  * Documentation sidebar navigation
  * Displays all available documentation files
  */
-export function DocsSidebar({ docs }: { docs: DocFile[] }) {
+export function DocsSidebar({
+  docs,
+  isAdmin = false,
+}: {
+  docs: DocFile[]
+  isAdmin?: boolean
+}) {
   const pathname = usePathname()
   const currentSlug = pathname.split('/').pop() || 'readme'
+  // Adjust top position: 40px (admin banner) + 56px (header) = 96px when admin, 56px when not
+  const topPosition = isAdmin ? 'top-24' : 'top-14'
 
   return (
-    <aside className="fixed top-14 left-0 bottom-0 z-30 w-64 border-r bg-background">
+    <aside className={`fixed ${topPosition} left-0 bottom-0 z-30 w-64 border-r bg-background`}>
       <div className="flex h-full flex-col">
         <div className="flex h-16 items-center border-b px-6">
           <Link href="/docs/readme" className="flex items-center space-x-2">

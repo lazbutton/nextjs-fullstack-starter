@@ -130,7 +130,7 @@ The `robots.txt` file is located at `public/robots.txt`:
 ```txt
 User-agent: *
 Allow: /
-Disallow: /dashboard/
+Disallow: /admin/
 Disallow: /api/
 Disallow: /auth/
 ```

@@ -6,6 +6,7 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Profile, ProfileInsert, ProfileUpdate } from './types'
 import { logger } from '@/lib/logger'
+import { DEFAULT_ROLE } from '@/lib/auth/roles'
 
 /**
  * Get a user profile by user ID
@@ -173,6 +174,7 @@ export async function ensureProfileExists(
       id: userId,
       email,
       full_name: fullName || null,
+      role: DEFAULT_ROLE,
     })
   } catch (error) {
     logger.error('Error ensuring profile exists', error)
