@@ -99,7 +99,7 @@ You can keep or remove documentation markdown files:
 rm -rf docs/
 
 # Remove root documentation files
-rm README.md ENV.md PROJECT_PREFERENCES.md CHANGELOG.md BOILERPLATE_IMPROVEMENTS.md
+rm README.md ENV.md _PROJECT_PREFERENCES.md CHANGELOG.md BOILERPLATE_IMPROVEMENTS.md
 ```
 
 **To keep some files (recommended):**
@@ -107,7 +107,7 @@ rm README.md ENV.md PROJECT_PREFERENCES.md CHANGELOG.md BOILERPLATE_IMPROVEMENTS
 ```bash
 # Keep README.md for basic project info
 # Keep ENV.md for environment variables reference
-# Keep PROJECT_PREFERENCES.md for team conventions
+# Keep _PROJECT_PREFERENCES.md for team conventions (hidden but used by AI)
 # Remove only the docs/ directory if you don't need the documentation pages
 rm -rf docs/
 ```
@@ -161,7 +161,7 @@ npm uninstall react-markdown remark-gfm
 
 # Remove all documentation files (optional)
 rm -rf docs/
-rm README.md ENV.md PROJECT_PREFERENCES.md CHANGELOG.md BOILERPLATE_IMPROVEMENTS.md
+rm README.md ENV.md _PROJECT_PREFERENCES.md CHANGELOG.md BOILERPLATE_IMPROVEMENTS.md
 
 echo "Documentation system removed. Don't forget to:"
 echo "1. Remove documentation links from header.tsx and footer.tsx"

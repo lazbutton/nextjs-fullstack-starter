@@ -139,7 +139,6 @@ supabase/      # SQL migrations
 - **[AUTHENTICATION.md](docs/AUTHENTICATION.md)** - Authentication system
 - **[DATABASE_PERFORMANCE.md](docs/DATABASE_PERFORMANCE.md)** - Performance optimization
 - **[EMAIL_GUIDE.md](docs/EMAIL_GUIDE.md)** - Email guide (Supabase + Resend)
-- **[PROJECT_PREFERENCES.md](PROJECT_PREFERENCES.md)** - Project conventions
 
 ## Commands
 

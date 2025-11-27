@@ -1,5 +1,7 @@
 # Conventions du Projet
 
+> **Note** : Ce fichier est caché de la documentation publique (préfixe `_`) mais reste accessible pour les développeurs et l'IA assistant.
+
 ## Git & Code
 
 - **Branche main** : Vérifier qu'elle est à jour avant chaque modification (`git pull origin main` ou `git fetch && git rebase origin/main`)

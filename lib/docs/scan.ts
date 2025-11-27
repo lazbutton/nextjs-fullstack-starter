@@ -67,7 +67,7 @@ export async function scanDocumentationFiles(): Promise<DocFile[]> {
 
     // Scan root directory for specific markdown files
     const rootFiles = await readdir(rootDir)
-    const allowedRootFiles = ['README.md', 'PROJECT_PREFERENCES.md', 'ENV.md']
+    const allowedRootFiles = ['README.md', 'ENV.md']
     
     for (const file of rootFiles) {
       // Skip hidden files (starting with _ or .)
@@ -154,9 +154,6 @@ function getIconForDoc(title: string): string {
 function getDescriptionForRootDoc(file: string): string {
   if (file === 'README.md') {
     return 'Project overview and getting started guide'
-  }
-  if (file === 'PROJECT_PREFERENCES.md') {
-    return 'Coding conventions and best practices'
   }
   if (file === 'ENV.md') {
     return 'Environment variables configuration'
