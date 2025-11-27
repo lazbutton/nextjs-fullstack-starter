@@ -212,11 +212,19 @@ When email verification is disabled:
 
 ### Enable Email Authentication
 
-1. Go to Supabase Dashboard > Authentication > Providers
-2. Enable "Email" provider
-3. Configure email settings:
-   - Confirm email: Enable if you want email verification
-   - Secure email change: Enable for security
+1. Go to Supabase Dashboard
+2. Click on **"Authentication"** in the left sidebar
+3. Click on **"Providers"** (or **"Auth Providers"**)
+4. Find **"Email"** in the list and click on it
+5. Enable the Email provider
+6. Configure email settings:
+   - **Confirm email**: Enable if you want email verification
+   - **Auto Confirm**: Enable to automatically confirm users without email verification
+   - **Secure email change**: Enable for security
+
+**Note**: The exact location may vary depending on your Supabase dashboard version. If you can't find these settings, try:
+- Authentication > Settings (or Configuration)
+- Authentication > Auth Providers > Email
 
 ### Redirect URLs
 

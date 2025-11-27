@@ -24,15 +24,20 @@ Vous devez également configurer Supabase pour auto-confirmer les emails. Voici 
 
 2. **Allez dans les paramètres d'authentification**
    - Dans le menu de gauche, cliquez sur **"Authentication"**
-   - Cliquez sur **"Providers"**
-   - Trouvez **"Email"** dans la liste
+   - Cliquez sur **"Providers"** (ou **"Auth Providers"** selon votre version)
+   - Trouvez **"Email"** dans la liste et cliquez dessus
 
 3. **Configurez l'auto-confirmation**
    - Activez **"Confirm email"** (si ce n'est pas déjà fait)
-   - **IMPORTANT** : Activez aussi **"Auto Confirm"**
+   - **IMPORTANT** : Activez aussi **"Auto Confirm"** (ou **"Enable email confirmations"** + **"Auto Confirm"**)
    - Cette option permet aux utilisateurs d'être automatiquement confirmés lors de l'inscription
 
-4. **Sauvegardez les modifications**
+4. **Alternative : Paramètres globaux d'authentification**
+   - Si vous ne trouvez pas dans Providers, allez dans **"Authentication"** > **"Settings"** (ou **"Configuration"**)
+   - Cherchez les options **"Enable email confirmations"** et **"Enable auto-confirm"**
+   - Activez **"Auto Confirm"** ou **"Enable auto-confirm"**
+
+5. **Sauvegardez les modifications**
 
 ## Comportement après désactivation
 
