@@ -26,7 +26,7 @@ export function CopyCodeButton({ code }: { code: string }) {
       variant="ghost"
       size="sm"
       onClick={handleCopy}
-      className="absolute top-2 right-2 h-8 w-8 p-0 opacity-70 transition-opacity hover:opacity-100 group-hover:opacity-100"
+      className="absolute top-2 right-2 h-8 w-8 p-0 opacity-60 transition-opacity hover:opacity-100 group-hover:opacity-100"
       aria-label="Copy code to clipboard"
     >
       {copied ? (
