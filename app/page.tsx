@@ -1,6 +1,26 @@
 import { getLocale } from '@/lib/i18n/cookies'
 import { getTranslationsForCurrentLocale } from '@/lib/i18n'
 import { SiteLayout } from '@/components/layout/site-layout'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Home',
+  description: 'A modern Next.js template with TypeScript, Supabase, authentication, and shadcn/ui components. Build full-stack applications quickly.',
+  keywords: [
+    'Next.js template',
+    'React starter',
+    'TypeScript boilerplate',
+    'Supabase authentication',
+    'Full-stack template',
+    'shadcn/ui',
+    'Modern web development',
+  ],
+  openGraph: {
+    title: 'Next.js Template - Modern Full-stack Starter',
+    description: 'A modern Next.js template with TypeScript, Supabase, authentication, and shadcn/ui components.',
+    type: 'website',
+  },
+}
 
 export default async function Home() {
   const locale = await getLocale()
