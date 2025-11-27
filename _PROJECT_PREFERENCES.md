@@ -178,3 +178,68 @@ Lors de la création d'une nouvelle page, vérifier :
 ## Middleware
 
 Le fichier `middleware.ts` est requis pour Supabase SSR. Ignorer le warning de dépréciation Next.js 16.
+
+## CI/CD avec Vercel & GitHub Actions
+
+**Note** : Ce projet utilise Vercel pour le déploiement automatique. Les GitHub Actions servent uniquement pour les vérifications pré-déploiement.
+
+### Architecture CI/CD
+
+1. **Vercel** : Déploiement automatique sur push vers `main`
+   - Build automatique
+   - Preview deployments pour les PR
+   - Production deployment sur merge
+
+2. **GitHub Actions** : Vérifications avant merge
+   - Linting et type checking
+   - Build verification
+   - Security audit
+   - PR quality checks
+
+### GitHub Actions Workflows
+
+- **`.github/workflows/ci.yml`** : Vérifications principales
+  - Lint & Type Check (parallèle)
+  - Build Check
+  - Security Audit
+  - Change Detection
+
+- **`.github/workflows/pr-checks.yml`** : Vérifications de qualité PR
+  - Format du titre (conventional commits)
+  - Présence d'une description
+
+- **`.github/workflows/dependabot-auto-merge.yml`** : Auto-merge pour Dependabot (optionnel)
+
+### Optimisations
+
+- **Cache npm** : Utilisation du cache GitHub Actions pour accélérer les installs
+- **Concurrency** : Annulation des runs en double pour économiser les minutes
+- **Timeouts** : Limites de temps pour éviter les runs bloqués
+- **Parallélisation** : Jobs indépendants exécutés en parallèle
+- **Conditional runs** : Certains jobs ne s'exécutent que si nécessaire
+
+### Variables d'environnement
+
+Pour les builds CI, utiliser les secrets GitHub :
+- `NEXT_PUBLIC_SUPABASE_URL` (optionnel, placeholder si absent)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (optionnel, placeholder si absent)
+- `NEXT_PUBLIC_APP_URL` (optionnel, placeholder si absent)
+
+### Best Practices
+
+- **Pas de déploiement dans GitHub Actions** : Laisser Vercel gérer les déploiements
+- **Fast feedback** : Les vérifications doivent être rapides (< 5 min)
+- **Fail fast** : Arrêter dès la première erreur critique
+- **Continue on warnings** : Certaines vérifications peuvent continuer en cas d'avertissement
+
+### Commandes utiles
+
+```bash
+# Tester localement les mêmes vérifications
+npm run lint
+npx tsc --noEmit
+npm run build
+
+# Vérifier les dépendances
+npm audit
+```
