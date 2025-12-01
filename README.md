@@ -1,11 +1,12 @@
 # Next.js Template
 
-Modern Next.js template with TypeScript, Supabase, shadcn/ui and Resend.
+Modern Next.js template with TypeScript, Neon, Stack Auth, shadcn/ui and Resend.
 
 ## Stack
 
 - **Next.js 16** App Router + TypeScript strict
-- **Supabase** (PostgreSQL + Auth)
+- **Neon** (PostgreSQL database)
+- **Stack Auth** (Authentication)
 - **shadcn/ui** + Tailwind CSS
 - **Resend** (welcome emails)
 - **i18n** (en, fr)
@@ -20,15 +21,14 @@ Modern Next.js template with TypeScript, Supabase, shadcn/ui and Resend.
 - ✅ Sign in/Sign out
 - ✅ Password reset
 - ✅ Email verification (configurable)
-- ✅ SSR session management with Supabase
+- ✅ SSR session management with Stack Auth
 - ✅ Route protection (middleware)
 - ✅ Automatic user profile creation
 - ✅ API to manually create profile (`/api/admin/create-profile`)
 
 #### Database
 
-- ✅ Supabase migrations (profiles, user_settings)
-- ✅ Row Level Security (RLS) configured
+- ✅ Neon database migrations (profiles, user_settings)
 - ✅ SQL triggers for automatic profile creation
 - ✅ Performance indexes
 - ✅ Utilities for optimized queries
@@ -68,8 +68,8 @@ Modern Next.js template with TypeScript, Supabase, shadcn/ui and Resend.
 
 - ✅ HTML email templates
 - ✅ Welcome email (Resend)
-- ✅ Authentication emails (Supabase)
-- ✅ Hybrid configuration (Supabase + Resend)
+- ✅ Authentication emails (Stack Auth)
+- ✅ Hybrid configuration (Stack Auth + Resend)
 
 #### SEO & Performance
 
@@ -118,13 +118,14 @@ git clone <your-repo-url>
 npm install
 
 # 2. Configure .env.local (copy from .env.example)
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+DATABASE_URL=your_neon_database_url
+NEXT_PUBLIC_DATABASE_URL=your_neon_database_url
+NEXT_PUBLIC_STACK_PROJECT_ID=your_stack_project_id
+NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=your_publishable_client_key
+STACK_SECRET_SERVER_KEY=your_secret_server_key
 RESEND_API_KEY=your_resend_api_key
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-# Required for admin scripts (create test user, promote users)
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 # Optional: SEO verification codes
 NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=your_code
 NEXT_PUBLIC_YANDEX_VERIFICATION=your_code
@@ -151,7 +152,7 @@ This account has full admin privileges and can access `/admin`. To create or upd
 npx tsx scripts/create-test-admin.ts
 ```
 
-**Note**: This requires `SUPABASE_SERVICE_ROLE_KEY` in your `.env.local` file.
+**Note**: This requires `STACK_SECRET_SERVER_KEY` and `DATABASE_URL` in your `.env.local` file.
 
 ## Structure
 
@@ -161,13 +162,14 @@ app/            # Pages and layouts
 components/     # React components
   ui/          # shadcn/ui
 lib/           # Utils and config
-  supabase/   # Supabase clients
+  neon/       # Neon database clients
+  stack/      # Stack Auth configuration
   database/   # DB utils
   auth/       # Auth utils
 types/         # TypeScript definitions
 i18n/          # Translations
 docs/          # Documentation
-supabase/      # SQL migrations
+database/      # SQL migrations (Neon compatible)
 ```
 
 ## Documentation

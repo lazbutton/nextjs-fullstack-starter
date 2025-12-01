@@ -7,21 +7,16 @@
  */
 
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { auth } from '@/app/api/auth/[...nextauth]/route'
 import { ensureProfileExists } from '@/lib/database/profiles'
 import { logger } from '@/lib/logger'
 
 export async function GET() {
   try {
-    const supabase = await createClient()
-
     // Get current authenticated user
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
+    const session = await auth()
 
-    if (userError || !user) {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in' },
         { status: 401 }
@@ -30,13 +25,13 @@ export async function GET() {
 
     // Ensure profile exists for this user
     const profile = await ensureProfileExists(
-      user.id,
-      user.email || '',
-      user.user_metadata?.full_name || undefined
+      session.user.id,
+      session.user.email || '',
+      session.user.name || undefined
     )
 
     if (!profile) {
-      logger.error(`Failed to create profile for user ${user.id}`)
+      logger.error(`Failed to create profile for user ${session.user.id}`)
       return NextResponse.json(
         { error: 'Failed to create profile' },
         { status: 500 }

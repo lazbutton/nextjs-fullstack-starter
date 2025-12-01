@@ -15,7 +15,7 @@ export function generateWebSiteStructuredData(): WithContext<WebSite> {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Next.js Template',
-    description: 'A modern Next.js template with TypeScript, Supabase, and shadcn/ui',
+    description: 'A modern Next.js template with TypeScript, Neon, Stack Auth, and shadcn/ui',
     url: BASE_URL,
     inLanguage: ['en', 'fr'],
     potentialAction: {

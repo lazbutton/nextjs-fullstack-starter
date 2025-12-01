@@ -5,48 +5,48 @@
  * Usage: This can be run as a one-time script or scheduled job
  * 
  * Note: This script requires server-side execution (cannot run in browser)
+ * Requires: DATABASE_URL environment variable
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import { ensureProfileExists } from '@/lib/database/profiles'
 import { logger } from '@/lib/logger'
 
 /**
- * Creates profiles for all users in auth.users who don't have a profile
+ * Creates profiles for all users who don't have a profile
  * @returns Number of profiles created
  */
 export async function createMissingProfiles(): Promise<number> {
   try {
-    const supabase = await createClient()
+    const sql = createClient()
     
-    // Get all users from auth.users
-    // Note: This requires admin access or a service role key
-    // In production, you might want to use a service role client for this
-    const { data: users, error: usersError } = await supabase.auth.admin.listUsers()
-    
-    if (usersError) {
-      logger.error('Error fetching users', usersError)
+    // Get all users who have passwords but no profile
+    const usersResult = await sql`
+      SELECT DISTINCT user_id, email FROM user_passwords
+      LEFT JOIN profiles ON user_passwords.user_id = profiles.id
+      WHERE profiles.id IS NULL
+    `
+
+    if (!usersResult || (Array.isArray(usersResult) && usersResult.length === 0)) {
+      logger.info('No users without profiles found')
       return 0
     }
 
-    if (!users || users.users.length === 0) {
-      logger.info('No users found')
-      return 0
-    }
-
+    const users = Array.isArray(usersResult) ? usersResult : [usersResult]
     let createdCount = 0
 
     // For each user, ensure they have a profile
-    for (const user of users.users) {
+    for (const user of users) {
+      const userRow = user as { user_id: string; email?: string | null }
       const profile = await ensureProfileExists(
-        user.id,
-        user.email || '',
-        user.user_metadata?.full_name || undefined
+        userRow.user_id,
+        userRow.email || '',
+        undefined
       )
 
       if (profile) {
         createdCount++
-        logger.info(`Created profile for user: ${user.email}`)
+        logger.info(`Created profile for user: ${userRow.email}`)
       }
     }
 
@@ -70,4 +70,3 @@ if (require.main === module) {
       process.exit(1)
     })
 }
-

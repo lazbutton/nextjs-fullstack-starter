@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { signUp } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,17 +23,24 @@ export function SignUpForm() {
       if (!result.success) {
         setError(result.error || 'An error occurred')
       } else {
-        // Check if user is automatically logged in (when email verification is disabled)
-        if (result.data?.autoLogin) {
-          // User is automatically logged in - redirect immediately
-          // Session is already active from server-side signup
+        // After successful signup, sign in the user automatically
+        const email = formData.get('email') as string
+        const password = formData.get('password') as string
+        
+        const signInResult = await signIn('credentials', {
+          email,
+          password,
+          redirect: false,
+        })
+        
+        if (signInResult?.ok) {
+          // User is logged in - redirect to home
           router.push('/')
           router.refresh()
-          return // Don't show success message, just redirect
+        } else {
+          // Signup succeeded but sign-in failed - show error
+          setError('Account created but failed to sign in. Please sign in manually.')
         }
-        
-        // Otherwise show success message (email verification required)
-        setSuccess(true)
       }
     })
   }

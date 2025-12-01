@@ -14,7 +14,7 @@
 
 ### Migrations
 
-- **Fichiers** : `/supabase/migrations/XXX_description.sql`
+- **Fichiers** : `/database/migrations/XXX_description.sql`
 - **Non-destructif** : Utiliser `IF EXISTS`, `IF NOT EXISTS`
 - **Ordre** : Appliquer séquentiellement (001, 002, etc.)
 - **Documentation** : Commenter chaque migration
@@ -170,12 +170,13 @@ Lors de la création d'une nouvelle page, vérifier :
 
 - Next.js 16 (App Router)
 - TypeScript (strict)
-- Supabase (PostgreSQL + Auth)
+- Neon (PostgreSQL database)
+- Stack Auth (Authentication)
 - shadcn/ui + Tailwind CSS
 - Resend (emails)
 - Server Actions
 
 ## Middleware
 
-Le fichier `middleware.ts` est requis pour Supabase SSR. Ignorer le warning de dépréciation Next.js 16.
+Le fichier `middleware.ts` est requis pour Stack Auth session management. Ignorer le warning de dépréciation Next.js 16.
 

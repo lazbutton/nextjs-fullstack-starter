@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { getLocale } from "@/lib/i18n/cookies";
 import { ToastProvider } from "@/components/providers/toast-provider";
+import { SessionProvider } from "@/components/providers/session-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +24,13 @@ export async function generateMetadata(): Promise<Metadata> {
       default: "Next.js Template",
       template: "%s | Next.js Template",
     },
-    description: "A modern Next.js template with TypeScript, Supabase, and shadcn/ui",
+    description: "A modern Next.js template with TypeScript, Neon, Stack Auth, and shadcn/ui",
     keywords: [
       "Next.js",
       "React",
       "TypeScript",
-      "Supabase",
+      "Neon",
+      "Stack Auth",
       "Tailwind CSS",
       "shadcn/ui",
       "Full-stack",
@@ -49,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: baseUrl,
       siteName: "Next.js Template",
       title: "Next.js Template",
-      description: "A modern Next.js template with TypeScript, Supabase, and shadcn/ui",
+      description: "A modern Next.js template with TypeScript, Neon, Stack Auth, and shadcn/ui",
       images: [
         {
           url: `${baseUrl}/og-image.png`,
@@ -62,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: "Next.js Template",
-      description: "A modern Next.js template with TypeScript, Supabase, and shadcn/ui",
+      description: "A modern Next.js template with TypeScript, Neon, Stack Auth, and shadcn/ui",
       images: [`${baseUrl}/og-image.png`],
       creator: "@YourTwitterHandle",
       site: "@YourTwitterHandle",
@@ -121,7 +123,7 @@ export default async function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Next.js Template',
-    description: 'A modern Next.js template with TypeScript, Supabase, and shadcn/ui',
+    description: 'A modern Next.js template with TypeScript, Neon, Stack Auth, and shadcn/ui',
     url: baseUrl,
     inLanguage: [locale, 'en', 'fr'],
     potentialAction: {
@@ -150,8 +152,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <ToastProvider />
+        <SessionProvider>
+          {children}
+          <ToastProvider />
+        </SessionProvider>
       </body>
     </html>
   );

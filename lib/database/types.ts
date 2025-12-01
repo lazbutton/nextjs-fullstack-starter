@@ -1,6 +1,6 @@
 /**
  * Database type definitions
- * These types represent the structure of your Supabase database tables
+ * These types represent the structure of your Neon database tables
  */
 
 import type { UserRole } from '@/lib/auth/roles'

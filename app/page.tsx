@@ -5,19 +5,20 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Home',
-  description: 'A modern Next.js template with TypeScript, Supabase, authentication, and shadcn/ui components. Build full-stack applications quickly.',
+  description: 'A modern Next.js template with TypeScript, Neon, Stack Auth, and shadcn/ui components. Build full-stack applications quickly.',
   keywords: [
     'Next.js template',
     'React starter',
     'TypeScript boilerplate',
-    'Supabase authentication',
+    'Stack Auth authentication',
+    'Neon database',
     'Full-stack template',
     'shadcn/ui',
     'Modern web development',
   ],
   openGraph: {
     title: 'Next.js Template - Modern Full-stack Starter',
-    description: 'A modern Next.js template with TypeScript, Supabase, authentication, and shadcn/ui components.',
+    description: 'A modern Next.js template with TypeScript, Neon, Stack Auth, and shadcn/ui components.',
     type: 'website',
   },
 }
@@ -42,7 +43,8 @@ export default async function Home() {
             <ul className="list-inside list-disc space-y-2 text-muted-foreground">
               <li>Next.js 16 with App Router</li>
               <li>TypeScript with strict mode</li>
-              <li>Supabase (PostgreSQL + Authentication)</li>
+              <li>Neon (PostgreSQL database)</li>
+              <li>Stack Auth (Authentication)</li>
               <li>shadcn/ui components</li>
               <li>Resend for email</li>
               <li>Server Actions</li>

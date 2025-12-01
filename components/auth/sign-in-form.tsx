@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import { signIn } from '@/app/actions/auth'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { signIn as nextAuthSignIn } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,19 +10,40 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export function SignInForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
+  // Check for error from URL (NextAuth redirects to error page)
+  const urlError = searchParams.get('error')
+  if (urlError === 'CredentialsSignin' && !error) {
+    setError('Invalid email or password')
+  }
+
   async function handleSubmit(formData: FormData) {
     setError(null)
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
+
     startTransition(async () => {
-      const result = await signIn(formData)
-      if (!result.success) {
-        setError(result.error || 'An error occurred')
-      } else {
-        // Redirect on successful sign in
-        router.push('/')
-        router.refresh()
+      try {
+        const result = await nextAuthSignIn('credentials', {
+          email,
+          password,
+          redirect: false,
+        })
+
+        if (result?.error) {
+          setError('Invalid email or password')
+        } else if (result?.ok) {
+          // Redirect on successful sign in
+          router.push('/')
+          router.refresh()
+        } else {
+          setError('An error occurred during sign in')
+        }
+      } catch (err) {
+        setError('An error occurred during sign in')
       }
     })
   }

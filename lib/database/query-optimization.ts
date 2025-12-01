@@ -29,7 +29,7 @@ export function buildOptimizedQuery<T>(
   filters?: Record<string, unknown>,
   options?: QueryOptions
 ) {
-  // This is a conceptual helper - actual implementation depends on Supabase client
+  // This is a conceptual helper - actual implementation depends on Neon client
   // The goal is to ensure queries use indexes efficiently
   
   const queryConfig = {

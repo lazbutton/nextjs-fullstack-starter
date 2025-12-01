@@ -25,29 +25,35 @@ user_settings_user_locale_idx   (user_id, locale)     - Composite
 ### ✅ TO DO
 
 ```typescript
+import { createClient } from '@/lib/neon/server'
+
+const sql = createClient()
+
 // 1. Use indexed columns
-await supabase
-  .from('profiles')
-  .select('*')
-  .eq('email', 'user@example.com') // Unique index
+await sql`
+  SELECT * FROM profiles 
+  WHERE email = ${'user@example.com'}
+  LIMIT 1
+`
 
 // 2. LIMIT for pagination
-await supabase
-  .from('profiles')
-  .select('*')
-  .limit(20)
+await sql`
+  SELECT * FROM profiles 
+  ORDER BY created_at DESC 
+  LIMIT 20
+`
 
 // 3. Select only needed columns
-await supabase
-  .from('profiles')
-  .select('id, email, full_name')
+await sql`
+  SELECT id, email, full_name FROM profiles
+`
 
 // 4. Use composite indexes
-await supabase
-  .from('profiles')
-  .select('*')
-  .order('created_at', { ascending: false })
-  .range(0, 9)
+await sql`
+  SELECT * FROM profiles 
+  ORDER BY created_at DESC 
+  LIMIT 10 OFFSET 0
+`
 ```
 
 ### ❌ TO AVOID
@@ -130,4 +136,5 @@ ANALYZE public.user_settings;
 ## Resources
 
 - [PostgreSQL Indexes](https://www.postgresql.org/docs/current/indexes.html)
-- [Supabase Performance](https://supabase.com/docs/guides/database/performance)
+- [Neon Documentation](https://neon.tech/docs)
+- [PostgreSQL Performance](https://www.postgresql.org/docs/current/performance-tips.html)

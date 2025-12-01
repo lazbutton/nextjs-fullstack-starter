@@ -3,8 +3,7 @@
  * Usage: npx tsx scripts/create-test-admin.ts
  * 
  * Requires environment variables:
- * - NEXT_PUBLIC_SUPABASE_URL
- * - SUPABASE_SERVICE_ROLE_KEY
+ * - DATABASE_URL
  * 
  * Creates user with:
  * - Email: doejohn@email.com
@@ -16,27 +15,12 @@
 
 import { config } from 'dotenv'
 import { resolve } from 'path'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/neon/server'
+import { getProfile, createProfile, updateProfile } from '@/lib/database/profiles'
+import bcrypt from 'bcryptjs'
 
 // Load environment variables from .env.local
 config({ path: resolve(process.cwd(), '.env.local') })
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('Missing required environment variables:')
-  console.error('- NEXT_PUBLIC_SUPABASE_URL')
-  console.error('- SUPABASE_SERVICE_ROLE_KEY')
-  process.exit(1)
-}
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
-  },
-})
 
 const TEST_EMAIL = 'doejohn@email.com'
 const TEST_PASSWORD = 'test'
@@ -48,101 +32,79 @@ async function createOrUpdateTestAdmin() {
   console.log(`Role: admin\n`)
 
   try {
-    // Check if user already exists
-    const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers()
+    const sql = createClient()
     
-    if (listError) {
-      console.error('Error fetching users:', listError)
-      process.exit(1)
-    }
-
-    const existingUser = existingUsers.users.find((u) => u.email === TEST_EMAIL)
+    // Check if user already exists
+    const existingResult = await sql`
+      SELECT id FROM profiles WHERE email = ${TEST_EMAIL} LIMIT 1
+    `
 
     let userId: string
 
-    if (existingUser) {
+    if (existingResult && (Array.isArray(existingResult) ? existingResult.length > 0 : true)) {
       console.log('User already exists, updating password and role...')
-      userId = existingUser.id
+      const rows = Array.isArray(existingResult) ? existingResult : [existingResult]
+      userId = (rows[0] as { id: string }).id
 
       // Update password
-      const { error: passwordError } = await supabase.auth.admin.updateUserById(userId, {
-        password: TEST_PASSWORD,
-      })
-
-      if (passwordError) {
-        console.error('Error updating password:', passwordError)
-        process.exit(1)
-      }
+      const hashedPassword = await bcrypt.hash(TEST_PASSWORD, 10)
+      await sql`
+        INSERT INTO user_passwords (user_id, password_hash)
+        VALUES (${userId}, ${hashedPassword})
+        ON CONFLICT (user_id) DO UPDATE SET password_hash = ${hashedPassword}
+      `
 
       console.log('✅ Password updated')
     } else {
       console.log('Creating new user...')
-      // Create new user
-      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+      // Generate user ID
+      userId = crypto.randomUUID()
+
+      // Create profile
+      const newProfile = await createProfile({
+        id: userId,
         email: TEST_EMAIL,
-        password: TEST_PASSWORD,
-        email_confirm: true, // Auto-confirm email
+        role: 'admin',
+        full_name: 'John Doe (Test Admin)',
       })
 
-      if (createError) {
-        console.error('Error creating user:', createError)
+      if (!newProfile) {
+        console.error('Failed to create profile')
         process.exit(1)
       }
 
-      if (!newUser.user) {
-        console.error('Failed to create user: No user returned')
-        process.exit(1)
-      }
+      // Hash and store password
+      const hashedPassword = await bcrypt.hash(TEST_PASSWORD, 10)
+      await sql`
+        INSERT INTO user_passwords (user_id, password_hash)
+        VALUES (${userId}, ${hashedPassword})
+      `
 
-      userId = newUser.user.id
       console.log('✅ User created')
     }
 
-    // Ensure profile exists with admin role
-    const { data: existingProfile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+    // Ensure profile has admin role
+    const existingProfile = await getProfile(userId)
 
-    if (existingProfile) {
+    if (existingProfile && existingProfile.role !== 'admin') {
       // Update existing profile to admin
-      const { data: updatedProfile, error: updateError } = await supabase
-        .from('profiles')
-        .update({ role: 'admin', email: TEST_EMAIL })
-        .eq('id', userId)
-        .select()
-        .single()
+      const updatedProfile = await updateProfile(userId, {
+        role: 'admin',
+        email: TEST_EMAIL,
+      })
 
-      if (updateError) {
-        console.error('Error updating profile:', updateError)
+      if (!updatedProfile) {
+        console.error('Error updating profile')
         process.exit(1)
       }
 
       console.log('✅ Profile updated to admin role')
       console.log(`Profile ID: ${updatedProfile.id}`)
       console.log(`Role: ${updatedProfile.role}`)
-    } else {
-      // Create new profile with admin role
-      const { data: newProfile, error: insertError } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          email: TEST_EMAIL,
-          role: 'admin',
-          full_name: 'John Doe (Test Admin)',
-        })
-        .select()
-        .single()
-
-      if (insertError) {
-        console.error('Error creating profile:', insertError)
-        process.exit(1)
-      }
-
-      console.log('✅ Profile created with admin role')
-      console.log(`Profile ID: ${newProfile.id}`)
-      console.log(`Role: ${newProfile.role}`)
+    } else if (existingProfile) {
+      console.log('✅ Profile already has admin role')
+      console.log(`Profile ID: ${existingProfile.id}`)
+      console.log(`Role: ${existingProfile.role}`)
     }
 
     console.log('\n✅ Test admin user is ready!')
@@ -165,4 +127,3 @@ createOrUpdateTestAdmin()
     console.error('Error:', error)
     process.exit(1)
   })
-

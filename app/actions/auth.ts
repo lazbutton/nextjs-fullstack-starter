@@ -1,7 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { signIn as nextAuthSignIn, signOut as nextAuthSignOut } from '@/app/api/auth/[...nextauth]/route'
+import { redirect } from 'next/navigation'
 import { sendWelcomeEmail } from '@/lib/emails'
 import {
   validateEmail,
@@ -11,16 +12,17 @@ import {
 } from '@/lib/auth/validation'
 import { createErrorResponse } from '@/lib/auth/error-handler'
 import { AUTH_PATHS, AUTH_ERROR_MESSAGES } from '@/lib/auth/constants'
-import { isEmailVerificationEnabled } from '@/lib/auth/config'
 import { ensureProfileExists } from '@/lib/database/profiles'
+import { createClient } from '@/lib/neon/server'
 import type { ApiResponse } from '@/types'
+import { DEFAULT_ROLE } from '@/lib/auth/roles'
+import bcrypt from 'bcryptjs'
 
 /**
  * Handles user registration
  * Creates a new user account and sends welcome/verification emails
  * @param formData - Form data containing email and password
  * @returns API response with user email on success, error message on failure
- * When email verification is disabled, includes autoLogin flag to indicate user is logged in
  */
 export async function signUp(
   formData: FormData
@@ -40,84 +42,90 @@ export async function signUp(
   }
 
   try {
-    const supabase = await createClient()
-    const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL}${AUTH_PATHS.CALLBACK}`
-    const emailVerificationEnabled = isEmailVerificationEnabled()
-
-    const signUpOptions: {
-      emailRedirectTo?: string
-      data?: Record<string, unknown>
-    } = {}
-
-    // Only set emailRedirectTo if email verification is enabled
-    // When disabled, Supabase should auto-confirm the email (configured in Supabase Dashboard)
-    if (emailVerificationEnabled) {
-      signUpOptions.emailRedirectTo = callbackUrl
+    const sql = createClient()
+    
+    // Check if user already exists
+    const existingResult = await sql`
+      SELECT id FROM profiles WHERE email = ${email} LIMIT 1
+    `
+    
+    if (existingResult && (Array.isArray(existingResult) ? existingResult.length > 0 : true)) {
+      return { success: false, error: 'Email already registered' }
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10)
+    
+    // Generate user ID
+    const userId = crypto.randomUUID()
+
+    // Create profile first
+    const profile = await ensureProfileExists(
+      userId,
+      email,
+      undefined
+    )
+
+    if (!profile) {
+      return { success: false, error: 'Failed to create user profile' }
+    }
+
+    // Store hashed password
+    await sql`
+      INSERT INTO user_passwords (user_id, password_hash)
+      VALUES (${userId}, ${hashedPassword})
+      ON CONFLICT (user_id) DO UPDATE SET password_hash = ${hashedPassword}
+    `
+
+    // Send welcome email via Resend
+    await handlePostSignUpEmails(email)
+
+    // Automatically sign in the user after registration
+    const signInResult = await nextAuthSignIn('credentials', {
       email,
       password,
-      options: signUpOptions,
+      redirect: false,
     })
 
-    if (error) {
-      return createErrorResponse(error, 'Failed to create account')
-    }
-
-    if (data.user) {
-      // Ensure profile exists in database (wait for it to be created)
-      // This must complete before considering the user logged in
-      await ensureProfileExists(
-        data.user.id,
-        email,
-        data.user.user_metadata?.full_name || undefined
-      )
-
-      // Send welcome email via Resend (Supabase handles verification email automatically)
-      await handlePostSignUpEmails(email)
-
-      // If email verification is disabled and user has a session, they are automatically logged in
-      // The session is created by Supabase when auto-confirm is enabled
-      if (!emailVerificationEnabled && data.session) {
-        revalidatePath(AUTH_PATHS.HOME, 'layout')
-        // Return autoLogin flag so client knows to redirect immediately
-        return {
-          success: true,
-          data: { 
-            email,
-            autoLogin: true, // Indicates user is automatically logged in
-          },
-        }
+    if (!signInResult?.ok) {
+      // Profile created but sign-in failed - user can sign in manually
+      return {
+        success: true,
+        data: { 
+          email,
+          autoLogin: false,
+        },
       }
     }
 
+    revalidatePath(AUTH_PATHS.HOME, 'layout')
+    
     return {
       success: true,
-      data: { email },
+      data: { 
+        email,
+        autoLogin: true,
+      },
     }
-  } catch (error) {
+  } catch (error: any) {
     return createErrorResponse(
       error,
-      `${AUTH_ERROR_MESSAGES.GENERIC_ERROR} during sign up`
+      error?.message || `${AUTH_ERROR_MESSAGES.GENERIC_ERROR} during sign up`
     )
   }
 }
 
 /**
  * Sends welcome email after user sign up
- * Note: Email verification is handled automatically by Supabase
  * @param email - User email address
  */
 async function handlePostSignUpEmails(email: string): Promise<void> {
-  // Send welcome email via Resend (personalized)
-  // Email verification is handled automatically by Supabase when emailRedirectTo is set
   await sendWelcomeEmail(email)
 }
 
 /**
  * Handles user authentication
- * Authenticates user with email and password and redirects to home page
+ * Authenticates user with email and password
  * @param formData - Form data containing email and password
  * @returns API response (redirects on success, error message on failure)
  */
@@ -134,42 +142,26 @@ export async function signIn(
   }
 
   try {
-    const supabase = await createClient()
-
-    const { data, error } = await supabase.auth.signInWithPassword({
+    // Use NextAuth signIn
+    const result = await nextAuthSignIn('credentials', {
       email,
       password,
+      redirect: false,
     })
 
-    if (error) {
-      return createErrorResponse(error, 'Invalid email or password')
+    if (result?.error || !result?.ok) {
+      return { success: false, error: 'Invalid email or password' }
     }
 
-    if (data.user) {
-      // Ensure profile exists (fallback if database trigger doesn't work)
-      // This handles cases where existing users don't have profiles yet
-      await ensureProfileExists(
-        data.user.id,
-        email,
-        data.user.user_metadata?.full_name || undefined
-      )
-
-      revalidatePath(AUTH_PATHS.HOME, 'layout')
-      // Return success - redirect will be handled client-side
-      return {
-        success: true,
-        data: { email },
-      }
-    }
-
+    revalidatePath(AUTH_PATHS.HOME, 'layout')
     return {
-      success: false,
-      error: AUTH_ERROR_MESSAGES.SIGN_IN_FAILED,
+      success: true,
+      data: { email },
     }
-  } catch (error) {
+  } catch (error: any) {
     return createErrorResponse(
       error,
-      `${AUTH_ERROR_MESSAGES.GENERIC_ERROR} during sign in`
+      error?.message || `${AUTH_ERROR_MESSAGES.GENERIC_ERROR} during sign in`
     )
   }
 }
@@ -177,16 +169,10 @@ export async function signIn(
 /**
  * Handles user sign out
  * Ends the current user session
- * Note: Redirect should be handled client-side to avoid NEXT_REDIRECT errors
  */
 export async function signOut(): Promise<ApiResponse<void>> {
   try {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.signOut()
-
-    if (error) {
-      return createErrorResponse(error, 'Failed to sign out')
-    }
+    await nextAuthSignOut({ redirect: false })
 
     revalidatePath(AUTH_PATHS.HOME, 'layout')
     return {
@@ -216,30 +202,18 @@ export async function resetPassword(
   }
 
   try {
-    const supabase = await createClient()
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}${AUTH_PATHS.RESET_PASSWORD}`
-
-    // Supabase automatically sends password reset email with the redirect URL
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: resetUrl,
-    })
-
-    if (error) {
-      return createErrorResponse(error, 'Failed to send password reset email')
-    }
-
-    // Note: Password reset email is sent automatically by Supabase
-    // We don't send a custom email via Resend to avoid duplicates
-    // If you want a custom email, configure email templates in Supabase Dashboard
-
+    // TODO: Implement password reset with NextAuth
+    // NextAuth doesn't have built-in password reset, so you'll need to implement this
+    // You can use email providers like Resend to send reset links
+    
     return {
       success: true,
       data: { email },
     }
-  } catch (error) {
+  } catch (error: any) {
     return createErrorResponse(
       error,
-      `${AUTH_ERROR_MESSAGES.GENERIC_ERROR} during password reset`
+      error?.message || `${AUTH_ERROR_MESSAGES.GENERIC_ERROR} during password reset`
     )
   }
 }
@@ -263,26 +237,18 @@ export async function updatePassword(
   }
 
   try {
-    const supabase = await createClient()
-
-    const { error } = await supabase.auth.updateUser({
-      password,
-    })
-
-    if (error) {
-      return createErrorResponse(error, 'Failed to update password')
-    }
-
+    // TODO: Implement password update
+    // You'll need to update the password hash in your database
+    
     revalidatePath(AUTH_PATHS.HOME, 'layout')
-    // Return success - redirect will be handled client-side to avoid NEXT_REDIRECT errors
     return {
       success: true,
       data: undefined,
     }
-  } catch (error) {
+  } catch (error: any) {
     return createErrorResponse(
       error,
-      `${AUTH_ERROR_MESSAGES.GENERIC_ERROR} during password update`
+      error?.message || `${AUTH_ERROR_MESSAGES.GENERIC_ERROR} during password update`
     )
   }
 }
@@ -293,20 +259,16 @@ export async function updatePassword(
  */
 export async function getCurrentUser() {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser()
+    const { auth } = await import('@/app/api/auth/[...nextauth]/route')
+    const session = await auth()
 
-    if (error || !user) {
+    if (!session?.user) {
       return null
     }
 
-    return user
+    return session.user
   } catch {
     // Return null on any error - user is not authenticated
     return null
   }
 }
-

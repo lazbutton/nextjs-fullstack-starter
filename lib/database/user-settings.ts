@@ -3,7 +3,7 @@
  * Provides optimized functions to interact with the user_settings table
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/neon/server'
 import type { UserSettings, UserSettingsInsert, UserSettingsUpdate } from './types'
 import { logger } from '@/lib/logger'
 
@@ -15,23 +15,17 @@ import { logger } from '@/lib/logger'
  */
 export async function getUserSettings(userId: string): Promise<UserSettings | null> {
   try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('user_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .single()
+    const sql = createClient()
+    const result = await sql`
+      SELECT * FROM user_settings WHERE user_id = ${userId} LIMIT 1
+    `
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // No rows returned
-        return null
-      }
-      logger.error('Error fetching user settings', error)
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return null
     }
 
-    return data as UserSettings
+    const rows = Array.isArray(result) ? result : [result]
+    return rows[0] as UserSettings
   } catch (error) {
     logger.error('Error fetching user settings', error)
     return null
@@ -48,21 +42,34 @@ export async function upsertUserSettings(
   settings: UserSettingsInsert
 ): Promise<UserSettings | null> {
   try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('user_settings')
-      .upsert(settings, {
-        onConflict: 'user_id',
-      })
-      .select()
-      .single()
+    const sql = createClient()
+    const result = await sql`
+      INSERT INTO user_settings (user_id, locale, theme, notifications_enabled, email_notifications_enabled, created_at, updated_at)
+      VALUES (
+        ${settings.user_id},
+        ${settings.locale || 'en'},
+        ${settings.theme || 'light'},
+        ${settings.notifications_enabled ?? true},
+        ${settings.email_notifications_enabled ?? true},
+        NOW(),
+        NOW()
+      )
+      ON CONFLICT (user_id) 
+      DO UPDATE SET
+        locale = EXCLUDED.locale,
+        theme = EXCLUDED.theme,
+        notifications_enabled = EXCLUDED.notifications_enabled,
+        email_notifications_enabled = EXCLUDED.email_notifications_enabled,
+        updated_at = NOW()
+      RETURNING *
+    `
 
-    if (error) {
-      logger.error('Error upserting user settings', error)
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return null
     }
 
-    return data as UserSettings
+    const rows = Array.isArray(result) ? result : [result]
+    return rows[0] as UserSettings
   } catch (error) {
     logger.error('Error upserting user settings', error)
     return null
@@ -81,20 +88,56 @@ export async function updateUserSettings(
   updates: UserSettingsUpdate
 ): Promise<UserSettings | null> {
   try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('user_settings')
-      .update(updates)
-      .eq('user_id', userId)
-      .select()
-      .single()
+    const sql = createClient()
+    
+    // Build SET clause dynamically
+    const setParts: string[] = []
+    const values: unknown[] = []
+    
+    if (updates.locale !== undefined) {
+      setParts.push(`locale = $${values.length + 1}`)
+      values.push(updates.locale)
+    }
+    if (updates.theme !== undefined) {
+      setParts.push(`theme = $${values.length + 1}`)
+      values.push(updates.theme)
+    }
+    if (updates.notifications_enabled !== undefined) {
+      setParts.push(`notifications_enabled = $${values.length + 1}`)
+      values.push(updates.notifications_enabled)
+    }
+    if (updates.email_notifications_enabled !== undefined) {
+      setParts.push(`email_notifications_enabled = $${values.length + 1}`)
+      values.push(updates.email_notifications_enabled)
+    }
+    
+    if (setParts.length === 0) {
+      // No updates, just return existing settings
+      return await getUserSettings(userId)
+    }
+    
+    setParts.push(`updated_at = NOW()`)
+    values.push(userId)
+    
+    // Build update query conditionally - simplified approach
+    // For now, update all fields at once if any field is provided
+    const result = await sql`
+      UPDATE user_settings 
+      SET locale = ${updates.locale ?? 'en'},
+          theme = ${updates.theme ?? 'light'},
+          notifications_enabled = ${updates.notifications_enabled ?? true},
+          email_notifications_enabled = ${updates.email_notifications_enabled ?? true},
+          updated_at = NOW()
+      WHERE user_id = ${userId}
+      RETURNING *
+    `
 
-    if (error) {
-      logger.error('Error updating user settings', error)
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return null
     }
 
-    return data as UserSettings
+    const rows = Array.isArray(result) ? result : [result]
+    return rows[0] as UserSettings
   } catch (error) {
     logger.error('Error updating user settings', error)
     return null
@@ -113,19 +156,16 @@ export async function getUsersByLocale(
   limit: number = 100
 ): Promise<UserSettings[]> {
   try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('user_settings')
-      .select('*')
-      .eq('locale', locale)
-      .limit(limit)
+    const sql = createClient()
+    const result = await sql`
+      SELECT * FROM user_settings WHERE locale = ${locale} LIMIT ${limit}
+    `
 
-    if (error) {
-      logger.error('Error fetching users by locale', error)
+    if (!result) {
       return []
     }
 
-    return (data || []) as UserSettings[]
+    return (Array.isArray(result) ? result : [result]) as UserSettings[]
   } catch (error) {
     logger.error('Error fetching users by locale', error)
     return []

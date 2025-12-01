@@ -4,30 +4,35 @@
 
 ### 1. Apply migrations
 
-**Via Supabase Dashboard** (recommended):
-1. Open [supabase.com](https://supabase.com) → Your project
+**Via Neon Dashboard** (recommended):
+1. Open [neon.tech](https://neon.tech) → Your project
 2. **SQL Editor** → **New Query**
-3. Copy-paste content from `/supabase/migrations/001_create_profiles_table.sql`
+3. Copy-paste content from `/database/migrations/000_initial_schema.sql`
 4. **Run** (Ctrl/Cmd + Enter)
-5. Repeat for `002_create_user_settings_table.sql`
-6. Repeat for `003_add_performance_indexes.sql`
+5. Verify tables were created successfully
 
-**Via Supabase CLI**:
+**Via psql CLI**:
 ```bash
-npm install -g supabase
-supabase login
-supabase link --project-ref your-project-ref
-supabase db push
+# Connect to your Neon database and run the migration
+psql $DATABASE_URL -f database/migrations/000_initial_schema.sql
 ```
+
+**Validate the migration**:
+```bash
+# Run validation script to verify everything was created correctly
+npx tsx scripts/validate-migration.ts
+```
+
+**Note**: Use only `000_initial_schema.sql` which contains the complete database schema compatible with Neon.
 
 ### 2. Verify
 
-**Table Editor** → Check presence of:
+**Neon Dashboard** → **Tables** → Check presence of:
 - ✅ `profiles`
 - ✅ `user_settings`
 
 **Database** → **Triggers** → Check:
-- ✅ `on_auth_user_created`
+- ✅ `on_auth_user_created` (if using database triggers for profile creation)
 
 ### 3. Test
 
@@ -64,10 +69,11 @@ created_at                   TIMESTAMP
 updated_at                   TIMESTAMP
 ```
 
-## Security (RLS)
+## Security
 
-Row Level Security enabled on all tables:
-- Users can view/modify **only their own data**
+Database security is handled at the application level:
+- Users can view/modify **only their own data** (enforced in application code)
+- Stack Auth handles authentication and user management
 
 ## Usage in code
 
@@ -90,7 +96,7 @@ await updateProfile(userId, {
 
 Table already exists. Options:
 1. Ignore (if structure is correct)
-2. Drop and recreate (dev only):
+2. Drop and recreate (dev only - **⚠️ WARNING: This will delete all data**):
 ```sql
 DROP TABLE IF EXISTS public.user_settings CASCADE;
 DROP TABLE IF EXISTS public.profiles CASCADE;
@@ -104,7 +110,7 @@ DROP TABLE IF EXISTS public.profiles CASCADE;
 SELECT * FROM pg_trigger WHERE tgname = 'on_auth_user_created';
 ```
 
-2. Check **Logs** in Supabase Dashboard
+2. Check **Logs** in Neon Dashboard
 
 ### RLS errors
 
@@ -118,5 +124,5 @@ SELECT * FROM pg_policies WHERE schemaname = 'public';
 
 ## Resources
 
-- [Supabase Migrations](https://supabase.com/docs/guides/database/migrations)
-- [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
+- [Neon Documentation](https://neon.tech/docs)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)

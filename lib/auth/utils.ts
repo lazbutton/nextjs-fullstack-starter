@@ -1,20 +1,17 @@
-import { createClient } from '@/lib/supabase/server'
+import { auth } from '@/app/api/auth/[...nextauth]/route'
 import { redirect } from 'next/navigation'
 import { getProfile } from '@/lib/database/profiles'
 import { isAdmin } from '@/lib/auth/roles'
 import type { UserRole } from '@/lib/auth/roles'
 
 export async function requireAuth() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const session = await auth()
 
-  if (!user) {
+  if (!session?.user) {
     redirect('/auth/sign-in')
   }
 
-  return user
+  return session.user
 }
 
 /**
@@ -34,12 +31,9 @@ export async function requireAdmin() {
 }
 
 export async function requireNoAuth() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const session = await auth()
 
-  if (user) {
+  if (session?.user) {
     redirect('/')
   }
 
@@ -53,19 +47,15 @@ export async function requireNoAuth() {
  */
 export async function getCurrentUserRole(): Promise<'admin' | 'moderator' | 'user' | null> {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const session = await auth()
 
-    if (!user) {
+    if (!session?.user) {
       return null
     }
 
-    const profile = await getProfile(user.id)
+    const profile = await getProfile(session.user.id)
     return profile?.role ?? null
   } catch (error) {
     return null
   }
 }
-

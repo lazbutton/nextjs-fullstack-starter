@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Next.js Template - Modern Full-stack Starter',
     short_name: 'Next.js Template',
-    description: 'A modern Next.js template with TypeScript, Supabase, and shadcn/ui',
+    description: 'A modern Next.js template with TypeScript, Neon, Stack Auth, and shadcn/ui',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',

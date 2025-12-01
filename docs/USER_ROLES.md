@@ -44,9 +44,10 @@ The `/admin` route is protected and requires:
 
 ### Method 1: Using the Script (Recommended)
 
-1. Ensure you have `SUPABASE_SERVICE_ROLE_KEY` in your `.env.local`:
+1. Ensure you have `STACK_SECRET_SERVER_KEY` and `DATABASE_URL` in your `.env.local`:
    ```bash
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   STACK_SECRET_SERVER_KEY=your_secret_server_key
+   DATABASE_URL=your_database_url
    ```
 
 2. Run the promotion script:
@@ -54,9 +55,9 @@ The `/admin` route is protected and requires:
    npx tsx scripts/promote-to-admin.ts user@example.com
    ```
 
-### Method 2: Via Supabase Dashboard
+### Method 2: Via Neon Dashboard
 
-1. Go to Supabase Dashboard → **Table Editor** → `profiles`
+1. Go to Neon Dashboard → **SQL Editor** → Run SQL query to update profile
 2. Find the user you want to promote
 3. Edit the `role` column
 4. Change from `user` to `admin`

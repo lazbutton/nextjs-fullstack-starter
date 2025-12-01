@@ -1,50 +1,26 @@
 /**
- * Middleware for Supabase session management and route protection
+ * Middleware for NextAuth session management and route protection
  * 
  * Note: Next.js 16 deprecates the middleware file convention in favor of "proxy".
- * However, this middleware is required for Supabase SSR session handling.
- * The middleware ensures user sessions are refreshed and managed correctly.
+ * However, this middleware is required for NextAuth session handling.
  * 
  * See: https://nextjs.org/docs/messages/middleware-to-proxy
- * Supabase SSR: https://supabase.com/docs/guides/auth/server-side/nextjs
+ * NextAuth: https://next-auth.js.org
  */
 
-import { updateSession } from '@/lib/supabase/middleware'
+import { auth } from '@/app/api/auth/[...nextauth]/route'
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { getProfile } from '@/lib/database/profiles'
 import { isAdmin } from '@/lib/auth/roles'
 
 export async function middleware(request: NextRequest) {
-  // First, update session for Supabase SSR
-  let response = await updateSession(request)
-
+  // NextAuth handles session management automatically via cookies
   // Protect /admin routes - require admin role
   if (request.nextUrl.pathname.startsWith('/admin')) {
     try {
-      const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          cookies: {
-            getAll() {
-              return request.cookies.getAll()
-            },
-            setAll(cookiesToSet) {
-              cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-              response = NextResponse.next({ request })
-              cookiesToSet.forEach(({ name, value, options }) =>
-                response.cookies.set(name, value, options)
-              )
-            },
-          },
-        }
-      )
+      const session = await auth()
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (!user) {
+      if (!session?.user) {
         // Not authenticated - redirect to sign in
         const signInUrl = new URL('/auth/sign-in', request.url)
         signInUrl.searchParams.set('redirect', request.nextUrl.pathname)
@@ -52,11 +28,7 @@ export async function middleware(request: NextRequest) {
       }
 
       // Check if user has admin role by querying profile directly
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
+      const profile = await getProfile(session.user.id)
 
       if (!profile || !isAdmin(profile.role)) {
         // Not admin - redirect to home
@@ -68,7 +40,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return response
+  return NextResponse.next()
 }
 
 export const config = {
@@ -78,9 +50,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - api/auth (NextAuth routes)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
-

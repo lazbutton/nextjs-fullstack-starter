@@ -6,7 +6,7 @@
 - Email verification
 - Password reset
 - Route protection
-- Emails (Supabase for auth + Resend for welcome)
+- Emails (Stack Auth for auth + Resend for welcome)
 
 ## Architecture
 
@@ -53,9 +53,10 @@ const { user, loading } = useAuth()
 ### 1. Environment Variables
 
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+# Stack Auth
+NEXT_PUBLIC_STACK_PROJECT_ID=your_project_id
+NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=your_publishable_client_key
+STACK_SECRET_SERVER_KEY=your_secret_server_key
 
 # Resend (welcome email)
 RESEND_API_KEY=your_key
@@ -63,26 +64,21 @@ RESEND_FROM_EMAIL=noreply@yourdomain.com
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Email verification (optional)
-ENABLE_EMAIL_VERIFICATION=true  # false to disable
 ```
 
-### 2. Supabase Dashboard
+### 2. Stack Auth Dashboard
 
-**Authentication** → **Providers** → **Email** :
-- ✅ Enable Email provider
-- ✅ Configure email confirmations (if verification desired)
-
-**Authentication** → **URL Configuration** :
-- Add: `http://localhost:3000/auth/callback` (dev)
-- Add: `https://yourdomain.com/auth/callback` (prod)
+**Stack Auth** → **Project Settings** :
+- ✅ Configure email provider
+- ✅ Set up email templates (verification, password reset)
+- ✅ Configure redirect URLs:
+  - Add: `http://localhost:3000/auth/callback` (dev)
+  - Add: `https://yourdomain.com/auth/callback` (prod)
 
 ### 3. Migrations
 
-Apply migrations (see `docs/DATABASE.md`) :
-- `001_create_profiles_table.sql`
-- `002_create_user_settings_table.sql`
+Apply the database migration (see `docs/DATABASE.md`) :
+- `000_initial_schema.sql` - Complete database schema
 
 ## Route Protection
 
@@ -112,7 +108,7 @@ export default async function PublicPage() {
 
 ### Hybrid Approach
 
-**Supabase** (automatic) :
+**Stack Auth** (automatic) :
 - Email verification
 - Password reset email
 
@@ -121,19 +117,13 @@ export default async function PublicPage() {
 
 See `docs/EMAIL_GUIDE.md` for details.
 
-### Disable email verification
-
-1. `.env.local`: `ENABLE_EMAIL_VERIFICATION=false`
-2. **Supabase Dashboard** → **Authentication** → **Providers** → **Email**:
-   - Enable "Auto Confirm"
-
 ## Security
 
-- Passwords hashed by Supabase
+- Passwords hashed by Stack Auth
 - Sessions via HTTP-only cookies
 - CSRF protection (Next.js)
-- RLS on database tables
+- Application-level data access control
 
 ## Resources
 
-- [Supabase Auth](https://supabase.com/docs/guides/auth)
+- [Stack Auth Documentation](https://docs.stack-auth.com)

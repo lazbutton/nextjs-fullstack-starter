@@ -2,7 +2,7 @@
 -- WARNING: This script will insert test data. Only run in development/staging environments.
 
 -- This file is optional and can be used to populate your database with test data
--- You can run this manually in Supabase SQL Editor or via Supabase CLI
+-- You can run this manually in Neon SQL Editor or via psql CLI
 
 -- Example: Insert test user profile (adjust user_id to match an existing auth.users entry)
 -- INSERT INTO public.profiles (id, email, full_name)

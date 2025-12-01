@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
-import { signOut } from '@/app/actions/auth'
+import { signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 
 export function UserButton() {
@@ -25,11 +25,7 @@ export function UserButton() {
   }
 
   const handleSignOut = async () => {
-    const result = await signOut()
-    if (result?.success) {
-      router.push('/auth/sign-in')
-      router.refresh()
-    }
+    await signOut({ redirect: true, callbackUrl: '/auth/sign-in' })
   }
 
   return (
@@ -41,4 +37,3 @@ export function UserButton() {
     </div>
   )
 }
-
